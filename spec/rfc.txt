@@ -1,0 +1,646 @@
+# CSV++ (CSV Plus Plus) Format Specification
+## Extension to RFC 4180 for Hierarchical Data
+
+**Official Name:** CSV++ (CSV Plus Plus)  
+**Version:** 1.0.0  
+**Date:** December 2025  
+**Extends:** RFC 4180 (Common Format and MIME Type for Comma-Separated Values)  
+**Inspired by:** HL7 Version 2.x delimiter hierarchy
+
+---
+
+## 1. Introduction
+
+CSV++ extends the CSV format defined in RFC 4180 to support repeating fields (one-to-many relationships) and hierarchical component structures while maintaining backward compatibility with standard CSV parsers.
+
+### 1.1 Motivation
+
+Traditional CSV files represent flat, tabular data. However, real-world data often contains:
+- Repeated values (e.g., multiple phone numbers for one person)
+- Structured components (e.g., addresses with street, city, state, zip)
+- Nested hierarchies (e.g., addresses with multiple address lines)
+
+CSV++ addresses these needs while keeping the simplicity and human-readability of CSV.
+
+### 1.2 Design Principles
+
+1. **Backward Compatibility**: Standard CSV parsers can read CSV++ files (though they won't interpret the enhanced structure)
+2. **Self-Documenting**: Structure is defined in column headers
+3. **Human Readable**: Data remains readable without special tools
+4. **Explicit Over Implicit**: Delimiters are declared, not assumed
+5. **Recursively Composable**: Structures can nest arbitrarily deep
+
+---
+
+## 2. Conformance with RFC 4180
+
+CSV++ files MUST conform to RFC 4180 with these specifications:
+
+- Fields are separated by a delimiter (comma by default)
+- Records are separated by line breaks (CRLF or LF)
+- Fields containing special characters MUST be enclosed in double-quotes
+- Double-quotes within quoted fields MUST be escaped by doubling: `""`
+- First record MAY be a header record
+- MIME type: `text/csv` (extensions may use `text/csv+plus` or `text/csvpp`)
+
+---
+
+## 3. Field Separator Detection
+
+The field separator character SHALL be determined by one of the following methods, in order of precedence:
+
+**Default Values:**
+If metadata directives are not specified, the following defaults apply:
+- `#array_sep=~` (tilde character)
+- `#component_sep=^` (caret character)
+
+These defaults are inspired by the HL7 Version 2.x delimiter hierarchy and can be overridden globally via metadata or per-field in headers.
+
+### 3.2 Auto-Detection (Fallback)
+
+If no metadata is present, parsers SHOULD auto-detect the field separator by:
+
+1. Scanning the first line (header row)
+2. Tracking bracket depth: `[]` and `{}`
+3. Identifying characters that appear outside brackets (depth = 0)
+4. Selecting the most common such character as the field separator
+5. Common candidates: `,` (comma), `\t` (tab), `|` (pipe), `;` (semicolon)
+
+---
+
+## 4. Array Fields (Repetitions)
+
+### 4.1 Column Name Rules
+
+Column names in CSV++ follow these rules:
+
+**Unquoted column names:**
+- MUST contain only: letters (A-Z, a-z), digits (0-9), underscore (_), and hyphen (-)
+- SHOULD start with a letter or underscore
+- MUST NOT contain delimiter characters: `^ ~ ; : |` or other special characters
+- MUST NOT contain structural characters: `[ ] ( ) ,` (comma) or whitespace
+
+**Quoted column names:**
+- If a column name contains special characters, it MUST be enclosed in double-quotes
+- Quotes follow RFC 4180 rules: `"column name with spaces"` or `"user@domain"`
+- Double-quotes within quoted names are escaped by doubling: `"column""with""quotes"`
+
+**Examples:**
+```csv
+# Valid unquoted names
+user_name,first-name,CustomerID,_internal
+
+# Requires quotes (contains special characters)
+"user@domain","price $","column with spaces","data[array]"
+
+# With array/structure syntax
+phone[],"email@address"[],user_name(first^last)
+```
+
+### 4.2 Syntax
+
+A field containing repeated values is declared in the header using brackets:
+
+```
+column_name[delimiter]
+column_name[]
+```
+
+- `column_name` - The name of the field
+- `[delimiter]` - Optional: The character used to separate repeated values
+- `[]` - Empty brackets use the default array delimiter
+
+**Delimiter Resolution:**
+1. If delimiter is specified: `phone[;]` uses `;`
+2. If empty brackets: `phone[]` uses default `~`
+
+**Examples:**
+- `phone[]` - Uses default delimiter (tilde `~`)
+- `phone[;]` - Explicitly uses semicolon
+
+### 4.3 Examples
+
+**With explicit delimiters:**
+```csv
+id,name,phone[|],email[;]
+1,John,555-1234|555-5678|555-9012,john@work.com;john@home.com
+2,Jane,555-4444,jane@company.com
+```
+
+**With default delimiters:**
+```csv
+id,name,phone[],email[]
+1,John,555-1234|555-5678|555-9012,john@work.com|john@home.com
+2,Jane,555-4444,jane@company.com
+```
+
+**With custom global default:**
+```csv
+#array_sep=;
+id,name,phone[],email[]
+1,John,555-1234;555-5678;555-9012,john@work.com;john@home.com
+2,Jane,555-4444,jane@company.com
+```
+
+**Mixing defaults and overrides:**
+```csv
+id,name,phone[],email[;]
+1,John,555-1234~555-5678,john@work.com;john@home.com
+```
+(phone uses default `~`, email overrides with `;`)
+
+### 4.4 Empty Values
+
+Empty values in repetitions are represented by consecutive delimiters:
+
+```csv
+id,tags[|]
+1,urgent||priority
+```
+
+This represents three tags: `"urgent"`, `""` (empty), `"priority"`
+
+### 4.5 Escaping
+
+If the repetition delimiter appears in the data, the entire field MUST be quoted per RFC 4180:
+
+```csv
+id,notes[|]
+1,"First note|with|pipes|Second note contains | character"
+```
+
+---
+
+## 5. Structured Fields (Components)
+
+### 5.1 Syntax
+
+A field containing structured components is declared using curly braces:
+
+```
+column_name[repetition_delim]component_delim{component1 component_delim component2 component_delim ...}
+column_name[]component_delim{component1 component_delim component2 component_delim ...}
+column_name[]{component1 component_delim component2 component_delim ...}
+column_name{component1 component_delim component2 component_delim ...}
+```
+
+- `[repetition_delim]` - Optional: enables multiple instances of the structure
+- `[]` - Empty brackets use default array delimiter
+- `component_delim` - The character separating components
+- `{...}` - Component names separated by `component_delim`
+
+**Component Delimiter Resolution:**
+1. If specified before `{`: `address^{...}` uses `^`
+2. If omitted and `#component_sep` is declared: `address{...}` uses that value
+3. If omitted and no metadata: `address{...}` uses default `^`
+
+**Shorthand when using all defaults:**
+```
+column_name[]{component1^component2^component3}
+```
+Equivalent to (assuming defaults):
+```
+column_name[~]^{component1^component2^component3}
+```
+
+### 5.2 Component Delimiter
+
+The component delimiter is the character that appears immediately before `{` and is used to separate component names within the braces and component values in the data.
+
+**Determination:**
+1. Explicit: Character immediately before `{` → `address^{...}` uses `^`
+2. Default with metadata: No character before `{` and `#component_sep=:` → uses `:`
+3. Default without metadata: No character before `{` → uses `^`
+
+**Valid forms:**
+- `geo^{lat^lon}` - Explicit `^` delimiter
+- `geo:{lat:lon}` - Explicit `:` delimiter  
+- `geo{lat^lon}` - Uses default (caret `^`)
+- With `#component_sep=:`, `geo{lat:lon}` uses `:`
+
+### 5.3 Examples
+
+**Simple structure with explicit delimiter:**
+```csv
+id,name,geo^{lat^lon}
+1,Location A,34.0522^-118.2437
+2,Location B,40.7128^-74.0060
+```
+
+**Simple structure with default delimiter:**
+```csv
+id,name,geo{lat^lon}
+1,Location A,34.0522^-118.2437
+2,Location B,40.7128^-74.0060
+```
+(Uses default `^` component delimiter)
+
+**Repeated structures with explicit delimiters:**
+```csv
+id,name,address[|]^{street^city^state^zip}
+1,John,123 Main St^Los Angeles^CA^90210|456 Oak Ave^New York^NY^10001
+2,Jane,789 Pine St^Boston^MA^02101
+```
+
+**Repeated structures with defaults:**
+```csv
+id,name,address[]{street^city^state^zip}
+1,John,123 Main St^Los Angeles^CA^90210~456 Oak Ave^New York^NY^10001
+2,Jane,789 Pine St^Boston^MA^02101
+```
+(Uses default `~` for repetitions and default `^` for components)
+
+**With custom global defaults:**
+```csv
+#array_sep=;
+#component_sep=:
+id,name,address[]{street:city:state:zip}
+1,John,123 Main St:Los Angeles:CA:90210;456 Oak Ave:New York:NY:10001
+```
+
+**Structure with optional components:**
+```csv
+id,person{first^middle^last}
+1,John^Q^Doe
+2,Jane^^Smith
+```
+(Jane has no middle name - empty component)
+
+---
+
+## 6. Nested Structures
+
+### 6.1 Recursive Composition
+
+Structures can nest arbitrarily deep. Component names can themselves be arrays or structures.
+
+### 6.2 Syntax
+
+Within component names in `{...}`, array and structure syntax applies recursively:
+
+```
+component_name[delimiter]
+component_name[delimiter]^{sub_component1^sub_component2}
+```
+
+### 6.3 Examples
+
+**Array within structure (explicit delimiters):**
+```csv
+id,name,address[|]^{type^lines[;]^city^state^zip}
+1,John,home^123 Main St;Apt 4^LA^CA^90210|work^456 Oak Ave;Suite 100^NYC^NY^10001
+```
+
+Breaking down `address[|]^{type^lines[;]^city^state^zip}`:
+- Multiple addresses separated by `|`
+- Each address has components separated by `^`
+- The `lines` component is an array separated by `;`
+
+**Array within structure (using defaults):**
+```csv
+id,name,address[]{type^lines[;]^city^state^zip}
+1,John,home^123 Main St;Apt 4^LA^CA^90210~work^456 Oak Ave;Suite 100^NYC^NY^10001
+```
+(Uses default `~` for address repetitions and default `^` for components)
+
+**Structure within structure (explicit):**
+```csv
+id,location^{name^coords:{lat:lon}}
+1,Office^34.05:-118.24
+2,Home^40.71:-74.00
+```
+
+Breaking down `location^{name^coords:{lat:lon}}`:
+- `location` has components separated by `^`
+- Components are: `name` and `coords`
+- `coords` itself is a structure with components separated by `:`
+- `coords` components are: `lat` and `lon`
+
+**Structure within structure (with different delimiters required):**
+```csv
+id,location{name^coords:{lat:lon}}
+1,Office^34.05:-118.24
+2,Home^40.71:-74.00
+```
+
+**Important:** When nesting structures, each level MUST use a different delimiter to distinguish between levels. You cannot use the same delimiter for both outer and inner components.
+
+**Deep nesting (explicit):**
+```csv
+id,data[|]^{category^items[;]~{name~price~tags[,]}}
+1,groceries^apples;red~1.99~fruit,fresh;bread;plain~2.49~bakery|electronics^laptop;pro~999.99~computer,portable
+```
+
+**Deep nesting (with some defaults):**
+```csv
+#array_sep=~
+id,data[]{category^items[;]:{name:price:tags[,]}}
+1,groceries^apples;red:1.99:fruit,fresh;bread;plain:2.49:bakery~electronics^laptop;pro:999.99:computer,portable
+```
+
+This represents:
+- Multiple `data` items separated by `~` (default)
+- Each has `category` and `items` (array separated by `;`)
+- Each item has structure separated by `:`: `name`, `price`, `tags` (array separated by `,`)
+
+### 6.4 Delimiter Selection Guidelines
+
+To maintain readability and parseability:
+
+1. **REQUIRED: Use different delimiters at each nesting level**
+   - Nested structures MUST use different component delimiters than their parent
+   - Example: `location^(name^coords:(lat:lon))` - outer uses `^`, inner uses `:`
+   - Invalid: `location(name^coords(lat^lon))` - both use `^` (ambiguous)
+
+2. Use visually distinct delimiters at each level
+3. **Recommended progression (inspired by HL7v2):** `~` → `^` → `;` → `:` → `,`
+   - Level 1 (repetitions): `~` (tilde)
+   - Level 2 (components): `^` (caret)
+   - Level 3 (sub-components): `;` (semicolon)
+   - Level 4 (sub-sub-components): `:` (colon)
+   - Level 5+: `,` or other characters
+4. Avoid using the field separator as a component delimiter
+5. Document delimiter choices for complex schemas
+6. **Recommendation:** Limit nesting to 3-4 levels maximum - if you need deeper hierarchy, consider using JSON or a proper hierarchical format instead of CSV++
+
+---
+
+## 7. Parsing Algorithm
+
+### 7.1 Header Parsing
+
+For each column header:
+
+1. **Detect field type:**
+   - Contains `{` → Structured field
+   - Contains `[` (not inside `{}`) → Array field
+   - Otherwise → Simple field
+
+2. **For array fields `name[delim]`:**
+   - Extract `name` (everything before `[`)
+   - Extract `delim` (everything between `[` and `]`)
+   - If field also contains `{`, proceed to structure parsing
+
+3. **For structured fields `name[...]delim(...)`:**
+   - Extract repetition delimiter from `[...]` (if present)
+   - Extract component delimiter (character before `(`)
+   - Split content within `(...)` by component delimiter
+   - Recursively parse each component name
+
+### 7.2 Data Parsing
+
+For each data cell corresponding to a structured header:
+
+1. **If array field:** Split by repetition delimiter
+2. **If structured field:** For each item (if array):
+   - Split by component delimiter
+   - Match values to component names by position
+   - Recursively parse nested structures
+3. **Handle escaping:** Respect RFC 4180 quoting rules
+
+### 7.3 Empty and Missing Values
+
+- Empty cell → null/undefined value
+- Empty component `^^value` → first component is empty string
+- Missing trailing components → undefined/null
+- Empty array item `a||b` → array of three items, middle is empty string
+
+---
+
+## 8. Examples
+
+### 8.1 Simple Arrays
+
+**With explicit delimiters:**
+```csv
+id,name,hobbies[|]
+1,Alice,reading|swimming|coding
+2,Bob,gaming
+3,Carol,hiking|photography|cooking
+```
+
+**With defaults:**
+```csv
+id,name,hobbies[]
+1,Alice,reading~swimming~coding
+2,Bob,gaming
+3,Carol,hiking~photography~cooking
+```
+
+### 8.2 Contact Information
+
+**Fully explicit:**
+```csv
+id,name,phone[|]^(type^number),email[;]
+1,John,mobile^555-1234|work^555-5678,john@work.com;john@personal.com
+2,Jane,home^555-4444,jane@company.com
+```
+
+**Using defaults:**
+```csv
+id,name,phone[](type^number),email[]
+1,John,mobile^555-1234~work^555-5678,john@work.com~john@personal.com
+2,Jane,home^555-4444,jane@company.com
+```
+
+### 8.3 Medical Records
+
+```csv
+patient_id,name,prescriptions[~]^(drug^dosage^schedule[;]:(time:instructions))
+P001,John Smith,Aspirin^100mg^morning:08:00:with food;evening:20:00:with food~Insulin^10u^morning:07:00:before meal;night:22:00:before bed
+```
+
+### 8.4 E-commerce Orders
+
+**Fully explicit:**
+```csv
+order_id,customer,items[|]^(sku^name^qty^price^options[;]:(key:value))
+ORD-001,Alice,SKU123^T-Shirt^2^19.99^size:M;color:blue|SKU456^Jeans^1^49.99^size:32;wash:dark
+```
+
+**Using defaults:**
+```csv
+order_id,customer,items[](sku^name^qty^price^options[;]:(key:value))
+ORD-001,Alice,SKU123^T-Shirt^2^19.99^size:M;color:blue~SKU456^Jeans^1^49.99^size:32;wash:dark
+```
+
+---
+
+## 9. Implementation Considerations
+
+### 9.1 Performance
+
+- Parsers MAY implement lazy evaluation for nested structures
+- Large files with deep nesting should be streamed, not loaded entirely into memory
+
+### 9.2 Validation
+
+Implementations SHOULD validate:
+- Matching number of components across repeated structures
+- Proper bracket nesting in headers
+- Delimiter conflicts (same delimiter used at multiple levels in nested structures)
+- **MUST reject:** Nested structures using the same component delimiter as their parent
+- Reasonable nesting depth (recommend warning beyond 3-4 levels)
+
+### 9.3 Error Handling
+
+When parsing fails:
+- Provide line and column numbers
+- Indicate whether error is in header or data
+- Suggest potential fixes (e.g., missing closing bracket)
+
+### 9.4 Limits
+
+Implementations MAY impose reasonable limits on:
+- Nesting depth (recommended maximum: 10 levels)
+- Number of components per structure (recommended maximum: 100)
+- Number of repetitions per array (recommended maximum: 1000)
+
+---
+
+## 10. MIME Type and File Extension
+
+### 10.1 MIME Type
+
+**Primary:** `text/csv`  
+**Alternative:** `text/csv+plus` or `text/csvpp`
+
+The alternative types can be used to signal CSV++ support, but standard `text/csv` ensures compatibility.
+
+### 10.2 File Extensions
+
+- `.csv` - Standard extension (recommended for compatibility)
+- `.csvpp` - Explicitly indicates CSV++ format
+- `.csvplus` - Alternative explicit extension
+
+---
+
+## 11. Migration from Standard CSV
+
+### 11.1 Backward Compatibility
+
+Standard CSV files are valid CSV++ files. A CSV file with headers `id,name,email` is a valid CSV++ file with three simple fields.
+
+### 11.2 Gradual Enhancement
+
+Existing CSV files can be enhanced incrementally:
+
+1. Add array syntax to appropriate columns: `phone` → `phone[|]`
+2. Add structure to complex fields: `address` → `address^{street^city^state^zip}`
+3. Combine for full expressiveness: `address[|]^{street^city^state^zip}`
+
+Standard CSV parsers will still read the file, though they won't interpret the structure.
+
+---
+
+## 12. Security Considerations
+
+### 12.1 Delimiter Injection
+
+Malicious data could attempt to inject delimiters to break parsing:
+- Implementations MUST respect RFC 4180 quoting
+- Quoted fields MUST be parsed as literal values
+- Delimiters inside quotes MUST NOT be interpreted as separators
+
+### 12.2 Complexity Attacks
+
+Deeply nested or highly repetitive structures could cause:
+- Excessive memory consumption
+- CPU exhaustion during parsing
+
+Mitigations:
+- Implement depth limits
+- Implement size limits
+- Use streaming parsers for large files
+- Validate headers before processing data
+
+### 12.3 Encoding Issues
+
+- Files SHOULD use UTF-8 encoding
+- Implementations SHOULD detect and handle encoding issues
+- BOM (Byte Order Mark) MAY be present
+
+---
+
+## 13. Complete Example
+
+**Using all defaults:**
+```csv
+order_id,customer_name,shipping_address(street_lines[;]^city^state^zip^country),items[](sku^description^quantity^unit_price^customizations[;]:(option:value)),order_total
+ORD-2024-001,John Smith,123 Main St;Apt 4B^Springfield^IL^62701^USA,WIDGET-A^Premium Widget^2^29.99^color:blue;engraving:Happy Birthday~GADGET-X^Deluxe Gadget^1^149.99^,209.97
+ORD-2024-002,Jane Doe,789 Oak Avenue^Boston^MA^02101^USA,THING-Z^Standard Thing^5^9.99^,49.95
+```
+
+**Explicit form (all delimiters specified):**
+```csv
+order_id,customer_name,shipping_address^(street_lines[;]^city^state^zip^country),items[~]^(sku^description^quantity^unit_price^customizations[;]:(option:value)),order_total
+ORD-2024-001,John Smith,123 Main St;Apt 4B^Springfield^IL^62701^USA,WIDGET-A^Premium Widget^2^29.99^color:blue;engraving:Happy Birthday~GADGET-X^Deluxe Gadget^1^149.99^,209.97
+ORD-2024-002,Jane Doe,789 Oak Avenue^Boston^MA^02101^USA,THING-Z^Standard Thing^5^9.99^,49.95
+```
+
+---
+
+## 14. References
+
+- RFC 4180: Common Format and MIME Type for Comma-Separated Values (CSV) Files
+- RFC 2046: Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types
+- HL7 Version 2.x: Health Level Seven International standard (inspiration for component/subcomponent model)
+
+---
+
+## 15. Authors
+
+Created as an extension to RFC 4180 for representing hierarchical and relational data in CSV format.
+
+## Appendix A: Grammar (ABNF-style)
+
+```
+csvpp-file     = header-row data-rows
+
+header-row     = field *(field-sep field) CRLF
+data-rows      = *(data-row CRLF)
+data-row       = value *(field-sep value)
+
+field          = simple-field / array-field / struct-field / array-struct-field
+simple-field   = name
+array-field    = name "[" [delimiter] "]"
+struct-field   = name [component-delim] "(" component-list ")"
+array-struct-field = name "[" [delimiter] "]" [component-delim] "(" component-list ")"
+
+component-list = component *(component-delim component)
+component      = simple-field / array-field / struct-field / array-struct-field
+
+name           = 1*field-char / quoted-name
+field-char     = ALPHA / DIGIT / "_" / "-"
+quoted-name    = DQUOTE 1*quoted-char DQUOTE
+quoted-char    = <any character except DQUOTE> / escaped-quote
+delimiter      = CHAR  ; any character except brackets and quotes
+component-delim = CHAR ; any character
+
+value          = quoted-value / unquoted-value
+quoted-value   = DQUOTE *(textdata / escaped-quote) DQUOTE
+unquoted-value = *textdata
+escaped-quote  = DQUOTE DQUOTE
+textdata       = ; any character except DQUOTE, CRLF, or field-sep
+```
+
+## Appendix B: Implementation Checklist
+
+For parser implementers:
+
+
+- [ ] Auto-detect field separator
+- [ ] Parse array syntax `field[delim]`
+- [ ] Parse structure syntax `field^{comp1^comp2}`
+- [ ] Parse combined syntax `field[|]^{comp1^comp2}`
+- [ ] Handle recursive nesting (arrays in structures, structures in arrays)
+- [ ] Respect RFC 4180 quoting and escaping
+- [ ] Handle empty values in arrays and structures
+- [ ] Validate bracket matching in headers
+- [ ] Provide clear error messages with line/column numbers
+- [ ] Support streaming for large files
+- [ ] Implement depth/size limits for security
+
+---
+
+**End of Specification**

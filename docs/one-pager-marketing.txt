@@ -1,0 +1,108 @@
+# CSV++: The Evolution CSV Needed
+
+## The Problem
+
+CSV files are everywhere—from data exports to ETL pipelines to API responses. But when your data has relationships (multiple phone numbers, addresses with structure, order line items), you face an impossible choice:
+
+- **Flatten everything** → Lose meaning, create data bloat, make updates nightmarish
+- **Use JSON/XML** → Sacrifice readability, tooling compatibility, and the simplicity people love about CSV
+- **Create multiple files** → Add complexity, break atomic updates, complicate distribution
+
+**Result**: Data teams waste countless hours wrestling with formats that don't fit their data.
+
+## The Solution
+
+CSV++ extends the beloved CSV format with simple, human-readable syntax for hierarchical and repeating data—while maintaining 100% backward compatibility with existing CSV tools.
+
+```csv
+order_id,customer,items[](product^quantity^price)
+ORD-001,Alice,Widget^2^19.99~Gadget^1^49.99
+```
+
+One file. One format. Complete relationships preserved.
+
+### Finding the Sweet Spot
+
+CSV++ isn't trying to replace specialized formats—it complements them:
+
+**HL7v2** → Purpose-built for healthcare interoperability with extensive domain-specific segments and strict compliance requirements. *Use HL7v2 when you need healthcare-specific standards and regulatory compliance.*
+
+**CSV++** → General-purpose structured data with hierarchical relationships in a broadly accessible format. *Use CSV++ when you need structure with simplicity, portability, and universal tool compatibility.*
+
+**JSON** → Flexible schema-free format ideal for deeply nested objects, APIs, and configuration. *Use JSON when you need maximum flexibility, complex nesting, or real-time data exchange.*
+
+CSV++ occupies the middle ground: more structure than flat CSV, simpler than HL7v2, more accessible than JSON. It's the format for when your data has relationships but your audience needs spreadsheets.
+
+## Key Benefits
+
+### For Data Engineers & Analysts
+- **Stop the flattening madness**: Represent one-to-many relationships naturally without JOIN pollution
+- **Single source of truth**: Keep related data together in one atomic, versioned file
+- **Works with existing tools**: Excel, pandas, and standard CSV parsers can still open it
+- **Human-debuggable**: No hex editors or pretty-printers needed—just open and read
+
+### For Software Developers
+- **Simpler data exchange**: Replace multi-endpoint APIs or complex JSON schemas with structured CSV
+- **Incremental adoption**: Add structure to existing CSV exports without breaking consumers
+- **Clear contracts**: Headers are self-documenting schemas—no separate documentation drift
+- **Validation-friendly**: Structure is explicit, making validation and type-checking straightforward
+
+### For Business Users
+- **Excel-compatible**: View in familiar tools without special software
+- **Email-friendly**: Share complex data as simple file attachments
+- **Audit-ready**: Version control works naturally—diffs are readable, changes are traceable
+- **Future-proof**: Based on RFC 4180 standard, not proprietary formats that might disappear
+
+### For Organizations
+- **Reduce integration costs**: One format for exports, imports, and data exchange
+- **Faster onboarding**: Everyone already knows CSV; learning the extensions takes minutes
+- **Lower storage costs**: No need for redundant denormalized tables
+- **Better data quality**: Structure enforces consistency at the format level
+
+## Real-World Use Cases
+
+**Healthcare**: Patient records with multiple prescriptions, dosing schedules, and medication instructions—all in one portable, HIPAA-friendly file
+
+**E-commerce**: Order exports with line items, product options, and shipping addresses—no more JOIN nightmares across 5 tables
+
+**IoT & Sensors**: Device readings with metadata, calibration parameters, and quality flags—structured but still CSV
+
+**HR Systems**: Employee records with multiple contacts, emergency contacts, certifications, and work history—easy to audit and version
+
+**Financial Services**: Transaction records with multiple parties, fee breakdowns, and compliance tags—clear provenance and traceability
+
+## Why Now?
+
+The data landscape has changed:
+- **Data volume is exploding**, but not every dataset needs a database
+- **Collaboration is distributed**—teams need portable, tool-agnostic formats
+- **Compliance demands transparency**—human-readable beats binary formats every time
+- **JSON fatigue is real**—developers want structure without the verbosity
+- **The middle ground is missing**—between flat CSV and complex formats, there's a gap
+
+CSV++ meets this moment: inspired by HL7v2's proven delimiter hierarchy, simplified for general use, and more accessible than JSON.
+
+## The Path Forward
+
+CSV++ isn't trying to replace HL7v2, JSON, XML, or databases. It's solving the specific pain point where flat CSV falls short but specialized formats are overkill.
+
+**Choose HL7v2 when**: Healthcare interoperability, regulatory compliance, industry-standard messaging
+
+**Choose CSV++ when**: Structured data exports, portable datasets, human-readable archives, multi-relationship data that needs spreadsheet compatibility
+
+**Choose JSON when**: API payloads, configuration files, complex nested objects, schema-free flexibility
+
+---
+
+## Get Started
+
+- **Specification**: RFC-compliant format definition
+- **Reference Implementation**: Open-source parsers in Python, JavaScript, Java
+- **Migration Tools**: Convert existing multi-CSV datasets to CSV++
+- **Community**: Join developers already using CSV++ in production
+
+**CSV++ is CSV, evolved. Same simplicity. More power. Zero barriers to adoption.**
+
+---
+
+*CSV++ extends RFC 4180 with optional hierarchical syntax. Standard CSV parsers read CSV++ files. CSV++ parsers unlock the structure.*
