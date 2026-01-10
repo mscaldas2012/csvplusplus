@@ -9,7 +9,7 @@
 <rfc
   xmlns:xi="http://www.w3.org/2001/XInclude"
   category="info"
-  docName="draft-mscaldas-csvpp-00"
+  docName="draft-mscaldas-csvpp-01"
   ipr="trust200902"
   submissionType="IETF"
   xml:lang="en"
@@ -18,7 +18,7 @@
   <front>
     <title abbrev="CSV++">CSV++ (CSV Plus Plus): Extension to RFC 4180 for Hierarchical Data</title>
     
-    <seriesInfo name="Internet-Draft" value="draft-mscaldas-csvpp-00"/>
+    <seriesInfo name="Internet-Draft" value="draft-mscaldas-csvpp-01"/>
     
     <author fullname="Marcelo Caldas" initials="M." surname="Caldas">
       <organization>Independent</organization>
@@ -34,7 +34,7 @@
       </address>
     </author>
     
-    <date year="2025" month="December" day="19"/>
+    <date year="2026" month="January" day="12"/>
     
     <area>Applications</area>
     <workgroup>Independent Submission</workgroup>
@@ -44,14 +44,7 @@
     <keyword>data format</keyword>
     
     <abstract>
-      <t>This document specifies CSV++ (CSV Plus Plus), an extension to the 
-	  Comma-Separated Values (CSV) format defined in RFC 4180. CSV++ adds 
-	  support for repeating fields (one-to-many relationships) and hierarchical
-	  component structures while maintaining backward compatibility with 
-	  standard CSV parsers. The extension uses declarative syntax in column 
-	  headers to define array fields and nested structures, enabling 
-	  representation of complex real-world data while preserving the 
-	  simplicity and human-readability of CSV.</t>
+      <t>This document specifies CSV++ (CSV Plus Plus), an extension to the Comma-Separated Values (CSV) format defined in RFC 4180. CSV++ adds support for repeating fields (one-to-many relationships) and hierarchicalcomponent structures while maintaining backward compatibility with standard CSV parsers. The extension uses declarative syntax in column headers to define array fields and nested structures, enabling representation of complex real-world data while preserving the simplicity and human-readability of CSV.</t>
     </abstract>
   </front>
 
@@ -60,28 +53,52 @@
       <name>Introduction</name>
       <t>CSV++ extends the CSV format defined in <xref target="RFC4180"/> to support repeating fields (one-to-many relationships) and hierarchical component structures while maintaining backward compatibility with standard CSV parsers.</t>
       
-      <section anchor="motivation">
-        <name>Motivation</name>
+     <section anchor="motivation">
+      <name>Motivation</name>
         <t>Traditional CSV files represent flat, tabular data. However, real-world data often contains:</t>
         <ul>
           <li>Repeated values (e.g., multiple phone numbers for one person)</li>
           <li>Structured components (e.g., addresses with street, city, state, zip)</li>
           <li>Nested hierarchies (e.g., addresses with multiple address lines)</li>
         </ul>
-        <t>CSV++ addresses these needs while keeping the simplicity and human-readability of CSV with a straightforward syntax.</t>
-      </section>
+  
+      <t>CSV++ addresses these limitations by introducing:</t>
+  
+      <t>While formats like JSON, XML, and YAML excel at representing hierarchical data, they introduce complexity and redundancy that may not be warranted for moderately structured datasets. CSV++ occupies a middle ground by extending CSV's tabular simplicity with hierarchical capabilities, making it particularly suitable for:</t>
+      <ul>
+        <li>Data interchange where CSV is already established but structure is needed</li>
+        <li>Spreadsheet applications where users expect tabular layouts</li>
+        <li>Systems with existing CSV infrastructure that need enhanced capabilities</li>
+        <li>Scenarios where human readability and editability in text editors is valued</li>
+        <li>Applications requiring backward compatibility with legacy CSV parsers</li>
+      </ul>
+  
+      <t>CSV++ maintains CSV's core strengths - simple tooling, wide compatibility, and human-readable plain text - while addressing its limitations with hierarchical data through declarative header syntax.</t>
+    </section>
+    <section anchor="when-to-use">
+      <name>When to Use CSV++</name>
+      <t>CSV++ is most appropriate for:</t>
+      <ul>
+        <li>Moderately structured data (1-3 levels of nesting)</li>
+        <li>Environments where CSV is already the established interchange format</li>
+        <li>Scenarios requiring backward compatibility with existing CSV infrastructure</li>
+        <li>Applications that benefit from self-documenting tabular data with inline structure definitions</li>
+        <li>Data that needs to be both machine-parseable and human-readable in plain text</li>
+        <li>Large datasets where file size and bandwidth matter, as CSV's columnar format avoids repeating field names in every record (unlike JSON or XML)</li>
+      </ul>
       
+      <t>For deeply nested hierarchical data (4+ levels), document-oriented formats like JSON or XML may provide better readability and tooling support. CSV++ aims to extend CSV's capabilities for moderately structured data while preserving its tabular nature, not to replace hierarchical data formats.</t>
+    </section>
       <section anchor="design-principles">
         <name>Design Principles</name>
         <ol>
           <li><strong>Backward Compatibility:</strong> Standard CSV parsers can read CSV++ files (though they won't interpret the enhanced structure)</li>
           <li><strong>Self-Documenting:</strong> Structure is defined in column headers</li>
-          <li><strong>Human Readable:</strong> Data remains readable without special tools</li>
+          <li><strong>Tabular Readability:</strong> Data maintains a tabular layout suitable for spreadsheet viewing and editing, though deeply nested structures (3+ levels) may be more readable in hierarchical formats like JSON</li>
           <li><strong>Explicit Over Implicit:</strong> Delimiters are declared, not assumed</li>
           <li><strong>Recursively Composable:</strong> Structures can nest to any depth, though practical implementations SHOULD limit nesting to 3-4 levels for readability</li>
         </ol>
       </section>
-
       <section anchor="requirements">
         <name>Requirements Language</name>
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.</t>
@@ -175,13 +192,16 @@ id,tags[|]
       
       <section anchor="escaping">
         <name>Escaping</name>
-        <t>If the repetition delimiter appears in the data, the entire field MUST be quoted per <xref target="RFC4180"/>:</t>
+        <t>If a repetition delimiter appears within the data itself, that individual value MUST be quoted per <xref target="RFC4180"/>. The repetition delimiter outside quotes still functions as a separator:</t>
         <figure>
+          <name>Escaping Delimiters in Array Values</name>
           <sourcecode type="csv"><![CDATA[
 id,notes[|]
-1,"First note|with|pipes|Second note contains | character"
+1,First note|Second note|"Third note contains | pipe character"
+2,"Note with | pipe"|Another note|Final note
 ]]></sourcecode>
         </figure>
+        <t>In the first row, there are three notes. The third note contains a literal pipe character. In the second row, the first note contains a literal pipe character.</t>
       </section>
     </section>
 
@@ -192,7 +212,8 @@ id,notes[|]
         <name>Syntax</name>
         <t>A field containing structured components is declared using parentheses:</t>
         <sourcecode type="abnf"><![CDATA[
-column_name[repetition_delim]component_delim(comp1 component_delim comp2 ...)
+column_name[repetition_delim]component_delim(
+    comp1 component_delim comp2 ...)
 column_name[]component_delim(comp1 component_delim comp2 ...)
 column_name[](comp1 component_delim comp2 ...)
 column_name(comp1 component_delim comp2 ...)
@@ -244,7 +265,7 @@ id,name,address[~]^(street^city^state^zip)
           <name>Array Within Structure</name>
           <sourcecode type="csv"><![CDATA[
 id,name,address[~]^(type^lines[;]^city^state^zip)
-1,John,home^123 Main St;Apt 4^LA^CA^90210~work^456 Oak Ave;Suite 100^NYC^NY^10001
+1,John,home^123 Main;Apt 4^LA^CA^90210~work^456 Oak^NY^NY^10001
 ]]></sourcecode>
         </figure>
         
@@ -327,36 +348,88 @@ id,location^(name^coords:(lat:lon))
     </section>
 
     <section anchor="security">
-      <name>Security Considerations</name>
-      
-      <section anchor="delimiter-injection">
-        <name>Delimiter Injection</name>
-        <t>Malicious data could attempt to inject delimiters to break parsing. Implementations MUST respect <xref target="RFC4180"/> quoting. Quoted fields MUST be parsed as literal values. Delimiters inside quotes MUST NOT be interpreted as separators.</t>
-      </section>
-      
-      <section anchor="complexity-attacks">
-        <name>Complexity Attacks</name>
-        <t>Deeply nested or highly repetitive structures could cause excessive memory consumption or CPU exhaustion during parsing.</t>
-        <t>Mitigations:</t>
-        <ul>
-          <li>Implement depth limits</li>
-          <li>Implement size limits</li>
-          <li>Use streaming parsers for large files</li>
-          <li>Validate headers before processing data</li>
-        </ul>
-      </section>
-      
-      <section anchor="encoding">
-        <name>Encoding Issues</name>
-        <t>Files SHOULD use UTF-8 encoding. Implementations SHOULD detect and handle encoding issues. BOM (Byte Order Mark) MAY be present.</t>
-      </section>
-    </section>
+  <name>Security Considerations</name>
 
-    <section anchor="iana">
-      <name>IANA Considerations</name>
-      <t>This document has no IANA actions.</t>
-      <t>CSV++ files use the text/csv media type defined in <xref target="RFC4180"/>. The format is fully backward compatible with standard CSV parsers.</t>
-    </section>
+  <t>
+    CSV is a long-established and widely deployed format with well-known security considerations.
+    As a result, most mature implementations already incorporate mitigations for common CSV-related
+    risks. This specification builds on <xref target="RFC4180"/> and remains fully backward
+    compatible, but introduces additional structural semantics that may increase parser complexity
+    and therefore require corresponding care in implementations.
+  </t>
+
+  <section anchor="injection-risks">
+    <name>Injection and Interpretation Risks</name>
+    <t>
+      Malicious data may attempt to inject delimiters or structural markers to influence parsing
+      behavior. Implementations MUST respect <xref target="RFC4180"/> quoting rules. Delimiters and
+      structural markers appearing within quoted fields MUST be treated as literal values.
+    </t>
+    <t>
+      The default delimiters defined by this specification are intentionally chosen to be neutral
+      and to avoid characters commonly associated with executable or control semantics. In
+      addition, the explicit declaration of any non-default delimiters in the header allows
+      parsers to establish expectations up front, reducing the likelihood of delimiter injection
+      or ambiguous interpretation.
+    </t>
+    <t>
+      As with traditional CSV, some spreadsheet applications interpret certain values (e.g. those
+      beginning with "=", "+", "-", or "@") as formulas. This specification does not attempt to
+      redefine or mitigate spreadsheet formula evaluation; producers and consumers SHOULD continue
+      to apply established best practices when targeting such environments.
+    </t>
+  </section>
+
+  <section anchor="complexity-attacks">
+    <name>Complexity and Resource Exhaustion</name>
+    <t>
+      Deeply nested, malformed, or highly repetitive structures may lead to excessive CPU or memory
+      consumption during parsing.
+    </t>
+    <t>Implementations SHOULD:</t>
+    <ul>
+      <li>Enforce configurable limits on nesting depth and repetition</li>
+      <li>Enforce reasonable limits on field sizes and record length</li>
+      <li>Fail fast on structurally invalid input</li>
+      <li>Prefer streaming or incremental parsing for large files</li>
+      <li>Validate headers and structural definitions before processing data rows</li>
+    </ul>
+  </section>
+
+  <section anchor="tool-interoperability">
+    <name>Mixed-Tool Interoperability</name>
+    <t>
+      CSV++ files may transit through tools unaware of the extended semantics, potentially resulting
+      in loss of structure or unintended reinterpretation. Implementations used in
+      security-sensitive pipelines SHOULD explicitly validate inputs and avoid implicit trust when
+      moving between CSV-aware and CSV++-aware tools.
+    </t>
+  </section>
+
+  <section anchor="encoding">
+    <name>Encoding Issues</name>
+    <t>
+      Files SHOULD use UTF-8 encoding. Implementations SHOULD detect and handle encoding errors.
+      A BOM (Byte Order Mark) MAY be present.
+    </t>
+  </section>
+
+  <section anchor="iana">
+  <name>IANA Considerations</name>
+  <t>
+    This document has no IANA actions.
+  </t>
+  <t>
+    CSV++ files use the <tt>text/csv</tt> media type as defined in
+    <xref target="RFC4180"/>. The format is fully backward compatible with
+    standard CSV parsers; implementations unaware of the extensions defined
+    in this document will process CSV++ files as conventional CSV, ignoring
+    extended semantics.
+  </t>
+</section>
+
+</section>
+
   </middle>
 
   <back>
@@ -372,9 +445,6 @@ id,location^(name^coords:(lat:lon))
       
       <references>
         <name>Informative References</name>
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2046.xml"/>
-        
-        
       </references>
     </references>
 
@@ -418,8 +488,8 @@ textdata       = <any character except DQUOTE, CRLF, or field-sep>
       <figure anchor="example-ecommerce">
         <name>E-commerce Order</name>
         <sourcecode type="csv"><![CDATA[
-order_id,customer,items[~]^(sku^name^qty^price^options[;]:(key:value))
-ORD-001,Alice,SKU123^T-Shirt^2^19.99^size:M;color:blue~SKU456^Jeans^1^49.99^size:32;wash:dark
+id,cust,items[~]^(sku^name^qty^price^opts[;]:(k:v))
+1,Alice,S1^Shirt^2^20^sz:M;col:blu~S2^Pant^1^50^sz:32
 ]]></sourcecode>
       </figure>
     </section>

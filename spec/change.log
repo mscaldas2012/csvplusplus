@@ -1,0 +1,16 @@
+# Changelog
+
+## [Draft 00] - 2026-01-07
+
+- Initial draft created.
+
+## [Draft 01] - 2026-01-12
+
+### Added
+- Added "When to Use CSV++" section.
+
+### Changed
+- Updated "Motivation" section.
+- Improved scaping example on 4.4
+- Updated "Security" to include CSV injection considerations.
+

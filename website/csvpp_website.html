@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV++ | Hierarchical Data in CSV Format</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        nav {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 4rem 0;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .graph-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 3rem auto;
+            max-width: 800px;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        .features {
+            background: var(--light);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .faq-item {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .faq-item h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .spec-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .spec-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">CSV<span>++</span></div>
+            <ul>
+                <li><a href="#" data-page="home">Home</a></li>
+                <li><a href="#" data-page="about">About</a></li>
+                <li><a href="#" data-page="faq">FAQ</a></li>
+                <li><a href="#" data-page="contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <div id="home-page" class="page-content active">
+        <section class="hero">
+            <h1>CSV++ (CSV Plus Plus)</h1>
+            <p>Bringing hierarchical data to CSV while maintaining backward compatibility</p>
+            <a href="#" class="cta-button" data-page="about">Learn More</a>
+        </section>
+
+        <section class="container">
+            <h2 style="text-align: center;">The Power of CSV with Structure</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">
+                CSV++ extends the familiar CSV format to support repeating fields and nested structures, 
+                enabling you to represent complex real-world data while preserving CSV's simplicity and readability.
+            </p>
+
+            <div class="graph-container">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2 style="text-align: center;">Why CSV++?</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>📊 Backward Compatible</h3>
+                        <p>Standard CSV parsers can read CSV++ files. Your existing tools still work.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔄 Hierarchical Data</h3>
+                        <p>Support for arrays and nested structures without the complexity of JSON or XML.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📝 Self-Documenting</h3>
+                        <p>Structure is declared in column headers, making files human-readable and self-explanatory.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎯 Simple Syntax</h3>
+                        <p>Use square brackets for arrays, parentheses for structures. Intuitive and declarative.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚡ Efficient</h3>
+                        <p>Columnar format avoids repeating field names in every record, saving bandwidth.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🛠️ Practical</h3>
+                        <p>Perfect for moderately structured data that needs both machine and human readability.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container">
+            <h2 style="text-align: center;">Quick Example</h2>
+            <pre>
+id,name,phones[|],address^(street^city^state^zip)
+1,John,555-1234|555-5678,123 Main St^Los Angeles^CA^90210
+2,Jane,555-4444,789 Pine St^Boston^MA^02101</pre>
+            <p style="text-align: center; margin-top: 1rem;">
+                This simple example shows multiple phone numbers and structured addresses in a CSV file.
+            </p>
+        </section>
+    </div>
+
+    <!-- ABOUT PAGE -->
+    <div id="about-page" class="page-content">
+        <section class="container" style="padding-top: 6rem;">
+            <h2>About CSV++</h2>
+            <p style="margin-bottom: 2rem;">
+                CSV++ (CSV Plus Plus) is an extension to the Comma-Separated Values (CSV) format defined in 
+                RFC 4180. It adds support for repeating fields (one-to-many relationships) and hierarchical 
+                component structures while maintaining backward compatibility with standard CSV parsers.
+            </p>
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">The Problem</h3>
+            <p>
+                Traditional CSV files excel at representing flat, tabular data. However, real-world data often contains:
+            </p>
+            <ul style="margin-left: 2rem; margin-top: 1rem;">
+                <li>Repeated values (e.g., multiple phone numbers for one person)</li>
+                <li>Structured components (e.g., addresses with street, city, state, zip)</li>
+                <li>Nested hierarchies (e.g., addresses with multiple address lines)</li>
+            </ul>
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">The Solution</h3>
+            <p>
+                While formats like JSON, XML, and YAML excel at representing hierarchical data, they introduce 
+                complexity and redundancy that may not be warranted for moderately structured datasets. CSV++ 
+                occupies a middle ground by extending CSV's tabular simplicity with hierarchical capabilities.
+            </p>
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">Design Principles</h3>
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <ol style="margin-left: 2rem;">
+                    <li><strong>Backward Compatibility:</strong> Standard CSV parsers can read CSV++ files</li>
+                    <li><strong>Self-Documenting:</strong> Structure is defined in column headers</li>
+                    <li><strong>Tabular Readability:</strong> Data maintains a tabular layout suitable for spreadsheets</li>
+                    <li><strong>Explicit Over Implicit:</strong> Delimiters are declared, not assumed</li>
+                    <li><strong>Recursively Composable:</strong> Structures can nest to any depth (though 3-4 levels recommended)</li>
+                </ol>
+            </div>
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">When to Use CSV++</h3>
+            <p>CSV++ is most appropriate for:</p>
+            <ul style="margin-left: 2rem; margin-top: 1rem;">
+                <li>Moderately structured data (1-3 levels of nesting)</li>
+                <li>Environments where CSV is already the established interchange format</li>
+                <li>Scenarios requiring backward compatibility with existing CSV infrastructure</li>
+                <li>Applications that benefit from self-documenting tabular data</li>
+                <li>Large datasets where file size and bandwidth matter</li>
+            </ul>
+
+            <p style="margin-top: 2rem;">
+                <strong>Note:</strong> For deeply nested hierarchical data (4+ levels), document-oriented formats 
+                like JSON or XML may provide better readability and tooling support.
+            </p>
+
+            <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" class="spec-link" target="_blank">
+                📄 Read the Full Specification (IETF Draft)
+            </a>
+        </section>
+    </div>
+
+    <!-- FAQ PAGE -->
+    <div id="faq-page" class="page-content">
+        <section class="container" style="padding-top: 6rem;">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <h3>What is CSV++?</h3>
+                <p>CSV++ is an extension to the standard CSV format (RFC 4180) that adds support for arrays and nested structures while maintaining full backward compatibility with existing CSV parsers.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Is CSV++ compatible with regular CSV?</h3>
+                <p>Yes! CSV++ files are valid CSV files. Standard CSV parsers can open them, though they won't interpret the enhanced structure. The structure is encoded in the column headers using special syntax.</p>
+            </div>
+            <div class="faq-item">
+                <h3>When should I use CSV++ instead of JSON or XML?</h3>
+                <p>Use CSV++ when you need moderately structured data in a tabular format that's both human-readable and machine-parseable, especially when working with existing CSV-based systems or when file size matters.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How do I create arrays in CSV++?</h3>
+                <p>Use square brackets in the header with a delimiter: <code>phone[|]</code> means the phone field contains multiple values separated by the pipe character. Empty brackets <code>[]</code> use the default delimiter (~).</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How do I create structured fields?</h3>
+                <p>Use parentheses to define components: <code>address^(street^city^state^zip)</code> creates an address structure with four components separated by the caret (^) character.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I combine arrays and structures?</h3>
+                <p>Absolutely! You can have arrays of structures: <code>address[~]^(street^city^state^zip)</code> represents multiple addresses, each with structured components.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What delimiters should I use?</h3>
+                <p>The specification recommends: ~ (tilde) for array values, ^ (caret) for structure components, ; (semicolon) for nested arrays, and : (colon) for deeply nested structures. You can use any character that doesn't conflict with your data.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How deep can I nest structures?</h3>
+                <p>Technically unlimited, but we recommend keeping it to 3-4 levels for readability. Beyond that, consider using JSON or XML instead.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What file extension should I use?</h3>
+                <p>Use <code>.csv</code> for maximum compatibility. You can optionally use <code>.csvpp</code> or <code>.csvplus</code> to explicitly indicate CSV++ format.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Are there any parsers or libraries available?</h3>
+                <p>The specification is currently an IETF draft. We're working on reference implementations and welcome community contributions. Contact us if you're interested in contributing!</p>
+            </div>
+
+            
+        </section>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div id="contact-page" class="page-content">
+        <section class="container" style="padding-top: 6rem;">
+            <h2 style="text-align: center;">Contact Us</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">
+                Have questions, feedback, or want to contribute? We'd love to hear from you!
+            </p>
+
+            <div class="contact-form">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+
+            <p style="text-align: center; margin-top: 2rem;">
+                You can also reach us directly at: 
+                <a href="mailto:csvplusplus@gmail.com" style="color: var(--primary);">csvplusplus@gmail.com</a>
+            </p>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 CSV++. An extension to RFC 4180 for hierarchical data.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+            Draft Specification: <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" style="color: white;">draft-mscaldas-csvpp-00</a>
+        </p>
+    </footer>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.getAttribute('data-page');
+                
+                // Hide all pages
+                document.querySelectorAll('.page-content').forEach(p => {
+                    p.classList.remove('active');
+                });
+                
+                // Show selected page
+                document.getElementById(page + '-page').classList.add('active');
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Contact form
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            const subject = encodeURIComponent(data.subject);
+            const body = encodeURIComponent(
+                `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`
+            );
+            
+            window.location.href = `mailto:csvplusplus@gmail.com?subject=${subject}&body=${body}`;
+            
+            alert('Your email client will open with the message. Please send it from there.');
+        });
+
+        // Chart
+        const canvas = document.getElementById('comparisonChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = 700;
+        canvas.height = 450;
+        
+        // Data
+        const data = {
+            labels: ['Simplicity', 'Hierarchy', 'File Size', 'Tooling', 'Human Readable'],
+            csv: [95, 20, 100, 100, 90],
+            csvpp: [85, 75, 95, 70, 85],
+            json: [60, 100, 70, 95, 70],
+            xml: [50, 100, 60, 90, 50]
+        };
+        
+        // Draw radar chart
+        function drawRadarChart() {
+            const centerX = canvas.width / 2;
+            const centerY = 200;
+            const radius = 150;
+            const sides = data.labels.length;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid circles
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 5; i++) {
+                ctx.beginPath();
+                for (let j = 0; j <= sides; j++) {
+                    const angle = (j * 2 * Math.PI) / sides - Math.PI / 2;
+                    const x = centerX + Math.cos(angle) * (radius * i / 5);
+                    const y = centerY + Math.sin(angle) * (radius * i / 5);
+                    if (j === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#d1d5db';
+            for (let i = 0; i < sides; i++) {
+                const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + Math.cos(angle) * radius,
+                    centerY + Math.sin(angle) * radius
+                );
+                ctx.stroke();
+            }
+            
+            // Draw labels
+            ctx.fillStyle = '#374151';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i < sides; i++) {
+                const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * (radius + 30);
+                const y = centerY + Math.sin(angle) * (radius + 30);
+                ctx.fillText(data.labels[i], x, y);
+            }
+            
+            // Draw data series
+            const series = [
+                { name: 'CSV++', data: data.csvpp, color: '#2563eb', fill: 'rgba(37, 99, 235, 0.2)' },
+                { name: 'JSON', data: data.json, color: '#10b981', fill: 'rgba(16, 185, 129, 0.1)' },
+                { name: 'XML', data: data.xml, color: '#f59e0b', fill: 'rgba(245, 158, 11, 0.1)' },
+                { name: 'CSV', data: data.csv, color: '#8b5cf6', fill: 'rgba(139, 92, 246, 0.1)' }
+            ];
+            
+            series.forEach(s => {
+                ctx.beginPath();
+                for (let i = 0; i <= sides; i++) {
+                    const idx = i % sides;
+                    const value = s.data[idx] / 100;
+                    const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+                    const x = centerX + Math.cos(angle) * (radius * value);
+                    const y = centerY + Math.sin(angle) * (radius * value);
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+                ctx.fillStyle = s.fill;
+                ctx.fill();
+                ctx.strokeStyle = s.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+            
+            // Draw legend
+            const legendX = 150;
+            const legendY = canvas.height - 40;
+            series.forEach((s, i) => {
+                ctx.fillStyle = s.color;
+                ctx.fillRect(legendX + i * 100, legendY, 15, 15);
+                ctx.fillStyle = '#374151';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(s.name, legendX + i * 100 + 20, legendY + 11);
+            });
+        }
+        
+        drawRadarChart();
+    </script>
+</body>
+</html>

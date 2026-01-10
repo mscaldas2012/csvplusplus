@@ -3,7 +3,7 @@
 
 **Official Name:** CSV++ (CSV Plus Plus)  
 **Version:** 1.0.0  
-**Date:** December 2025  
+**Date:** January 2026  
 **Extends:** RFC 4180 (Common Format and MIME Type for Comma-Separated Values)  
 **Inspired by:** HL7 Version 2.x delimiter hierarchy
 
