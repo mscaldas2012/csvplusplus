@@ -10,7 +10,8 @@
 - Added "When to Use CSV++" section.
 
 ### Changed
-- Updated "Motivation" section.
+- Enhanced Motivation section to contrast with JSON/XML
+- Added "When to Use CSV++" section
 - Improved scaping example on 4.4
-- Updated "Security" to include CSV injection considerations.
+- Updated Security section to include CSV injection considerations.
 

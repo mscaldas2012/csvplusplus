@@ -427,9 +427,17 @@ id,location^(name^coords:(lat:lon))
     extended semantics.
   </t>
 </section>
-
 </section>
-
+<section anchor="changelog" numbered="false">
+  <name>Change Log</name>
+  <t>Changes from -00 to -01:</t>
+  <ul>
+    <li>Enhanced Motivation section to contrast with JSON/XML</li>
+    <li>Added "When to Use CSV++" section</li>
+    <li>Improved scaping example on 4.4</li>
+    <li>Updated Security section to include CSV injection considerations.</li>
+  </ul>
+</section>
   </middle>
 
   <back>
