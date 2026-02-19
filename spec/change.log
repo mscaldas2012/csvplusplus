@@ -1,5 +1,14 @@
 # Changelog
 
+## [Draft 02] - 2026-02-19
+
+### Changed
+- Header row is now REQUIRED (MUST) in all CSV++ documents; headerless files are not supported.
+- Removed language suggesting the header row is optional (was: "MAY be a header record").
+- Removed references to auto-identification of field types from data without a header.
+- Clarified that the tilde (~) default array delimiter applies to first-level arrays only. Nested arrays MUST explicitly specify a delimiter; using empty brackets ([]) at any deeper nesting level is invalid.
+- Added Quoting and Escaping section. RFC 4180 quoting MUST only be applied to leaf elements (atomic values not further split by any delimiter). Quoting non-leaf values (entire arrays or structured fields) is invalid and MUST be rejected by parsers.
+
 ## [Draft 00] - 2026-01-07
 
 - Initial draft created.

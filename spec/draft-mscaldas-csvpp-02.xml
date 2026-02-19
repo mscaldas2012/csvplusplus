@@ -9,7 +9,7 @@
 <rfc
   xmlns:xi="http://www.w3.org/2001/XInclude"
   category="info"
-  docName="draft-mscaldas-csvpp-01"
+  docName="draft-mscaldas-csvpp-02"
   ipr="trust200902"
   submissionType="IETF"
   xml:lang="en"
@@ -18,7 +18,7 @@
   <front>
     <title abbrev="CSV++">CSV++ (CSV Plus Plus): Extension to RFC 4180 for Hierarchical Data</title>
     
-    <seriesInfo name="Internet-Draft" value="draft-mscaldas-csvpp-01"/>
+    <seriesInfo name="Internet-Draft" value="draft-mscaldas-csvpp-02"/>
     
     <author fullname="Marcelo Caldas" initials="M." surname="Caldas">
       <organization>Independent</organization>
@@ -34,7 +34,7 @@
       </address>
     </author>
     
-    <date year="2026" month="January" day="12"/>
+    <date year="2026" month="February" day="19"/>
     
     <area>Applications</area>
     <workgroup>Independent Submission</workgroup>
@@ -113,7 +113,7 @@
         <li>Records are separated by line breaks (CRLF or LF)</li>
         <li>Fields containing special characters MUST be enclosed in double-quotes</li>
         <li>Double-quotes within quoted fields MUST be escaped by doubling: ""</li>
-        <li>First record MAY be a header record per RFC 4180. However, CSV++ array and structure features REQUIRE headers to declare field types</li>
+        <li>The first record MUST be a header row declaring all field names and their types. CSV++ does not support headerless files; a header row is REQUIRED in every CSV++ document.</li>
         <li>MIME type: text/csv</li>
       </ul>
     </section>
@@ -144,16 +144,26 @@ column_name[]
         <t>Where:</t>
         <ul>
           <li>column_name - The name of the field</li>
-          <li>[delimiter] - Optional: The character used to separate repeated values</li>
-          <li>[] - Empty brackets use the default array delimiter</li>
+          <li>[delimiter] - The character used to separate repeated values</li>
+          <li>[] - Empty brackets use the default array delimiter (first-level arrays only; see below)</li>
         </ul>
-        
+
         <t>Delimiter Resolution:</t>
         <ol>
-          <li>If delimiter is specified: phone[|] uses |</li>
-          <li>If empty brackets: phone[] uses the tilde (~) as default delimiter</li>
+          <li>If a delimiter is specified: phone[|] uses |</li>
+          <li>If empty brackets at the top (first) nesting level: phone[] uses the tilde (~) as the default delimiter</li>
+          <li>If empty brackets at any deeper nesting level: INVALID. Nested arrays MUST explicitly specify a delimiter.</li>
         </ol>
-        <t>The tilde (~) is recommended as the default array delimiter to avoid conflicts with common data characters and the field separator.</t>
+
+        <t>The tilde (~) is the default array delimiter for first-level (top-level) arrays only.
+        When an array appears nested inside a structure or another array, its delimiter MUST be
+        explicitly declared and MUST differ from every delimiter already in use at enclosing levels.
+        Omitting the delimiter (using []) is not permitted for nested arrays.</t>
+
+        <t>Rationale: because the default tilde (~) is already consumed as the outermost repetition
+        separator, reusing it at an inner level would make the data ambiguous and unparseable.
+        Requiring an explicit delimiter at each inner level keeps the format unambiguous and
+        consistent with the general principle that every nesting level MUST use a distinct delimiter.</t>
       </section>
       
       <section anchor="array-examples">
@@ -192,16 +202,9 @@ id,tags[|]
       
       <section anchor="escaping">
         <name>Escaping</name>
-        <t>If a repetition delimiter appears within the data itself, that individual value MUST be quoted per <xref target="RFC4180"/>. The repetition delimiter outside quotes still functions as a separator:</t>
-        <figure>
-          <name>Escaping Delimiters in Array Values</name>
-          <sourcecode type="csv"><![CDATA[
-id,notes[|]
-1,First note|Second note|"Third note contains | pipe character"
-2,"Note with | pipe"|Another note|Final note
-]]></sourcecode>
-        </figure>
-        <t>In the first row, there are three notes. The third note contains a literal pipe character. In the second row, the first note contains a literal pipe character.</t>
+        <t>If a delimiter character appears within a leaf value, that leaf value MUST be quoted per
+        <xref target="RFC4180"/>. Quoting rules and the definition of a leaf element are specified
+        in <xref target="quoting"/>.</t>
       </section>
     </section>
 
@@ -291,6 +294,89 @@ id,location^(name^coords:(lat:lon))
           <li><strong>Recommendation:</strong> Limit nesting to 3-4 levels maximum</li>
         </ol>
       </section>
+    </section>
+
+    <section anchor="quoting">
+      <name>Quoting and Escaping</name>
+
+      <section anchor="quoting-leaf">
+        <name>Leaf Elements</name>
+        <t>A <strong>leaf element</strong> is a value that will not be further split by any array
+        or component delimiter — it is the innermost atomic unit at its position in the CSV++
+        hierarchy. Examples of leaf elements:</t>
+        <ul>
+          <li>The value of a simple field</li>
+          <li>An individual item within an array (a single repetition after splitting on the array delimiter)</li>
+          <li>An individual component value within a structure (a single component after splitting on the component delimiter)</li>
+          <li>An individual item within a nested array or nested structure, once all enclosing levels have been split</li>
+        </ul>
+        <t>RFC 4180 double-quote quoting MUST only be applied to leaf elements. Quoting a value
+        that still contains unprocessed array or component delimiters causes those delimiters to
+        be treated as literal characters, preventing the parser from splitting the value into its
+        constituent parts. This MUST NOT be done.</t>
+      </section>
+
+      <section anchor="quoting-valid">
+        <name>Valid Quoting (Leaf-Level)</name>
+        <t>Quoting is valid when applied to an individual leaf value to escape a delimiter
+        character that appears literally within that value:</t>
+        <figure>
+          <name>Quoting an Individual Array Item (Leaf)</name>
+          <sourcecode type="csv"><![CDATA[
+id,notes[|]
+1,First note|"Second note with | pipe"|Third note
+]]></sourcecode>
+        </figure>
+        <t>The second array item is a leaf; quoting it escapes the literal pipe. The outer pipe
+        delimiters that separate the three items remain unquoted and function as separators.</t>
+
+        <figure>
+          <name>Quoting an Individual Component Value (Leaf)</name>
+          <sourcecode type="csv"><![CDATA[
+id,address^(street^city^state^zip)
+1,"123 Main St, Apt 4"^Springfield^IL^62701
+]]></sourcecode>
+        </figure>
+        <t>The street component is a leaf; quoting it escapes the comma within the street address.</t>
+      </section>
+
+      <section anchor="quoting-invalid">
+        <name>Invalid Quoting (Non-Leaf)</name>
+        <t>Quoting MUST NOT be applied to a value that contains unprocessed array or component
+        delimiters. The following examples are invalid CSV++ and MUST be rejected by parsers:</t>
+
+        <figure>
+          <name>Invalid: Quoting an Entire Array Field Value</name>
+          <sourcecode type="csv"><![CDATA[
+id,notes[|]
+1,"First note|Second note|Third note"
+]]></sourcecode>
+        </figure>
+        <t>The field value is quoted at the array level. The pipe characters are treated as literal
+        data, so the parser sees a single note rather than three. This defeats the purpose of the
+        array declaration and is invalid.</t>
+
+        <figure>
+          <name>Invalid: Quoting a Structured Value</name>
+          <sourcecode type="csv"><![CDATA[
+id,address^(street^city^state^zip)
+1,"123 Main St^Springfield^IL^62701"
+]]></sourcecode>
+        </figure>
+        <t>The entire structured value is quoted. The component delimiters are swallowed by the
+        quote, so no components can be extracted. This is invalid.</t>
+
+        <figure>
+          <name>Invalid: Quoting an Array Item That Is Itself Structured</name>
+          <sourcecode type="csv"><![CDATA[
+id,address[~]^(street^city^state^zip)
+1,"123 Main St^Springfield^IL^62701"~456 Oak Ave^New York^NY^10001
+]]></sourcecode>
+        </figure>
+        <t>The first repetition is quoted at the structure level, preventing component splitting.
+        To escape a literal tilde within a component leaf, quote only that leaf value.</t>
+      </section>
+
     </section>
 
     <section anchor="parsing">
@@ -430,6 +516,14 @@ id,location^(name^coords:(lat:lon))
 </section>
 <section anchor="changelog" numbered="false">
   <name>Change Log</name>
+  <t>Changes from -01 to -02:</t>
+  <ul>
+    <li>Header row is now REQUIRED (MUST) in all CSV++ documents; headerless files are not supported.</li>
+    <li>Removed language suggesting the header row is optional (was: "MAY be a header record").</li>
+    <li>Removed references to auto-identification of field types from data without a header.</li>
+    <li>Clarified that the tilde (~) default array delimiter applies to first-level (top-level) arrays only. Nested arrays MUST explicitly specify a delimiter distinct from all enclosing levels; using empty brackets ([]) in a nested array is invalid.</li>
+    <li>Added Quoting and Escaping section defining leaf elements. RFC 4180 quoting MUST only be applied to leaf elements (atomic values not further split by any delimiter). Quoting non-leaf values (entire arrays or structured fields) is explicitly invalid and MUST be rejected by parsers.</li>
+  </ul>
   <t>Changes from -00 to -01:</t>
   <ul>
     <li>Enhanced Motivation section to contrast with JSON/XML</li>
