@@ -4,267 +4,968 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV++ | Hierarchical Data in CSV Format</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --secondary: #10b981;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --border: #e5e7eb;
+            --bg: #07090f;
+            --surface: #0d1220;
+            --surface-2: #131b2e;
+            --border: #1c2538;
+            --border-bright: #28374f;
+            --text: #e0dbd3;
+            --text-dim: #6b7a90;
+            --text-dimmer: #38485e;
+            --amber: #f0a030;
+            --amber-dim: rgba(240, 160, 48, 0.12);
+            --amber-glow: rgba(240, 160, 48, 0.3);
+            --teal: #1fd4a8;
+            --teal-dim: rgba(31, 212, 168, 0.1);
+            --purple: #c792ea;
+            --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+            --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+            background-size: 44px 44px;
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: var(--font-sans);
             line-height: 1.6;
-            color: var(--dark);
+            font-size: 16px;
+            overflow-x: hidden;
         }
 
+        /* ─── NAV ────────────────────────────────────────────── */
         nav {
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 200;
+            background: rgba(7, 9, 15, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
         }
 
-        nav .container {
+        .nav-inner {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 2rem;
+            padding: 0 2rem;
+            height: 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
         }
 
-        .logo span {
-            color: var(--secondary);
-        }
+        .logo-plus { color: var(--amber); }
 
         nav ul {
             list-style: none;
             display: flex;
-            gap: 2rem;
         }
 
         nav a {
             text-decoration: none;
-            color: var(--dark);
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
             font-weight: 500;
-            transition: color 0.3s;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            padding: 0.45rem 1.1rem;
+            border-radius: 4px;
+            transition: color 0.18s, background 0.18s;
+            display: block;
         }
 
-        nav a:hover {
-            color: var(--primary);
+        nav a:hover, nav a.active {
+            color: var(--amber);
+            background: var(--amber-dim);
         }
 
+        /* ─── CONTAINER ──────────────────────────────────────── */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
-        section {
-            padding: 4rem 0;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 6rem 2rem;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: var(--secondary);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .graph-container {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin: 3rem auto;
-            max-width: 800px;
-        }
-
-        canvas {
-            max-width: 100%;
-        }
-
-        .features {
-            background: var(--light);
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .feature-card h3 {
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        .page-content {
-            display: none;
-        }
+        /* ─── PAGE SYSTEM ────────────────────────────────────── */
+        .page-content { display: none; }
 
         .page-content.active {
             display: block;
+            animation: pageIn 0.45s ease forwards;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── HERO ───────────────────────────────────────────── */
+        .hero {
+            min-height: calc(100vh - 60px);
+            display: flex;
+            align-items: center;
+            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: -160px;
+            left: 50%;
+            transform: translateX(-60%);
+            width: 900px;
+            height: 700px;
+            background: radial-gradient(ellipse, rgba(240,160,48,0.055) 0%, transparent 68%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-left { animation: fadeUp 0.55s ease 0.1s both; }
+        .hero-right { animation: fadeUp 0.55s ease 0.28s both; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .eyebrow::before {
+            content: '';
+            display: block;
+            width: 28px;
+            height: 1px;
+            background: var(--amber);
+            flex-shrink: 0;
+        }
+
+        .hero h1 {
+            font-family: var(--font-mono);
+            font-size: clamp(4rem, 9vw, 7rem);
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            color: var(--text);
+            margin-bottom: 1.6rem;
+        }
+
+        .h1-plus { color: var(--amber); }
+
+        .hero-desc {
+            font-size: 1.05rem;
+            color: var(--text-dim);
+            font-weight: 300;
+            line-height: 1.75;
+            max-width: 460px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 0.875rem;
+            flex-wrap: wrap;
+        }
+
+        /* ─── BUTTONS ────────────────────────────────────────── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            background: var(--amber);
+            color: #080a10;
+            padding: 0.72rem 1.6rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px var(--amber-glow);
+            background: #f5b040;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            background: transparent;
+            color: var(--text-dim);
+            padding: 0.72rem 1.6rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: 1px solid var(--border-bright);
+            cursor: pointer;
+            transition: border-color 0.18s, color 0.18s, background 0.18s;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--text-dim);
+            color: var(--text);
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* ─── CODE WINDOW ────────────────────────────────────── */
+        .code-window {
+            background: var(--surface);
+            border: 1px solid var(--border-bright);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04),
+                0 24px 60px rgba(0,0,0,0.55),
+                0 0 40px rgba(240,160,48,0.04);
+        }
+
+        .code-bar {
+            background: var(--surface-2);
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background: #ff5f57; }
+        .dot-y { background: #febc2e; }
+        .dot-g { background: #28c840; }
+
+        .code-bar-title {
+            margin: 0 auto;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-dimmer);
+            letter-spacing: 0.04em;
+            padding-right: 30px;
+        }
+
+        .code-body {
+            padding: 1.4rem 1.5rem;
+            overflow-x: auto;
+            min-height: 180px;
+        }
+
+        .code-body code {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            line-height: 1.85;
+            display: block;
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: var(--text-dim);
+        }
+
+        .code-line {
+            display: block;
+            white-space: pre;
+            opacity: 0;
+            transform: translateX(-6px);
+            transition: opacity 0.28s ease, transform 0.28s ease;
+        }
+        .code-line.shown { opacity: 1; transform: translateX(0); }
+
+        /* Syntax token colors */
+        .t-hdr  { color: var(--teal); }
+        .t-arr  { color: var(--amber); }
+        .t-str  { color: var(--purple); }
+        .t-num  { color: #f78c6c; }
+        .t-val  { color: var(--text); }
+        .t-cmt  { color: var(--text-dimmer); font-style: italic; }
+
+        /* ─── STATS STRIP ────────────────────────────────────── */
+        .stats-strip {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .stats-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .stat-item {
+            padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border);
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--amber);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-dimmer);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ─── SECTION PRIMITIVES ─────────────────────────────── */
+        section { padding: 5.5rem 0; }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-label::before {
+            content: '';
+            display: block;
+            width: 22px;
+            height: 1px;
+            background: var(--amber);
+            flex-shrink: 0;
         }
 
         h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            color: var(--dark);
+            font-family: var(--font-mono);
+            font-size: clamp(1.7rem, 3vw, 2.4rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            color: var(--text);
+            margin-bottom: 0.875rem;
+            line-height: 1.2;
+        }
+
+        .section-desc {
+            font-size: 0.975rem;
+            color: var(--text-dim);
+            font-weight: 300;
+            max-width: 560px;
+            margin-bottom: 2.75rem;
+            line-height: 1.75;
+        }
+
+        /* ─── CHART SECTION ──────────────────────────────────── */
+        .chart-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chart-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5.5rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .chart-wrap {
+            background: var(--surface-2);
+            border: 1px solid var(--border-bright);
+            border-radius: 10px;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas { max-width: 100%; }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* ─── FEATURE GRID ───────────────────────────────────── */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .feature-card {
+            background: var(--bg);
+            padding: 2rem;
+            transition: background 0.2s;
+        }
+
+        .feature-card:hover { background: var(--surface); }
+
+        .f-icon {
+            display: block;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            opacity: 0.85;
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.65;
+        }
+
+        .feature-card p code {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+            color: var(--teal);
+        }
+
+        /* ─── EXAMPLE SECTION ────────────────────────────────── */
+        .example-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        pre {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.75;
+            color: var(--text-dim);
+        }
+
+        pre .t-hdr  { color: var(--teal); }
+        pre .t-arr  { color: var(--amber); }
+        pre .t-str  { color: var(--purple); }
+        pre .t-num  { color: #f78c6c; }
+        pre .t-val  { color: var(--text); }
+        pre .t-cmt  { color: var(--text-dimmer); font-style: italic; }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.84em;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 0.15rem 0.38rem;
+            border-radius: 3px;
+            color: var(--teal);
+        }
+
+        .example-note {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+            line-height: 1.65;
+        }
+
+        /* ─── ABOUT PAGE ─────────────────────────────────────── */
+        .about-layout {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 4rem;
+            padding: 5.5rem 0;
+        }
+
+        .about-toc {
+            position: sticky;
+            top: 80px;
+            align-self: start;
+        }
+
+        .toc-heading {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-dimmer);
+            margin-bottom: 0.875rem;
+        }
+
+        .toc-nav {
+            list-style: none;
+            border-left: 1px solid var(--border);
+        }
+
+        .toc-nav li a {
+            display: block;
+            padding: 0.4rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            border-left: 2px solid transparent;
+            margin-left: -1px;
+            transition: color 0.18s, border-color 0.18s;
+        }
+
+        .toc-nav li a:hover {
+            color: var(--amber);
+            border-left-color: var(--amber);
+        }
+
+        .about-body { padding-top: 5.5rem; }
+
+        .about-body h2 { margin-bottom: 1.25rem; }
+
+        .about-body p {
+            color: var(--text-dim);
+            line-height: 1.78;
+            font-size: 0.94rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-body h3 {
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--teal);
+            margin-top: 2.75rem;
+            margin-bottom: 0.875rem;
+            padding-top: 2.75rem;
+            border-top: 1px solid var(--border);
+            letter-spacing: 0.02em;
+        }
+
+        .about-body h3:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 1.75rem;
+        }
+
+        .about-body h2[id], .about-body h3[id] {
+            scroll-margin-top: 80px;
+        }
+
+        .about-body ul, .about-body ol {
+            margin-left: 1.5rem;
+            color: var(--text-dim);
+            font-size: 0.94rem;
+            line-height: 1.75;
+        }
+
+        .about-body li { margin-bottom: 0.3rem; }
+
+        .about-body strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .principle-list {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.25rem 0 1.5rem;
+        }
+
+        .principle-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .principle-row:last-child { border-bottom: none; }
+
+        .p-num {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--amber);
+            font-weight: 600;
+            padding-top: 0.15rem;
+            min-width: 22px;
+        }
+
+        .p-text {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.65;
+        }
+
+        .p-text strong { color: var(--text); font-weight: 500; }
+
+        .spec-cta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            padding: 1.2rem 1.4rem;
+            background: var(--amber-dim);
+            border: 1px solid rgba(240,160,48,0.22);
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.18s, border-color 0.18s;
+        }
+
+        .spec-cta:hover {
+            background: rgba(240,160,48,0.18);
+            border-color: rgba(240,160,48,0.38);
+        }
+
+        .spec-cta span {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--amber);
+            font-weight: 500;
+        }
+
+        /* ─── FAQ PAGE ───────────────────────────────────────── */
+        .faq-wrap { padding: 5.5rem 0; }
+
+        .faq-list {
+            margin-top: 2.75rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .faq-item {
-            background: white;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
         }
 
-        .faq-item h3 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+        .faq-item:last-child { border-bottom: none; }
+
+        .faq-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            text-align: left;
+            gap: 1rem;
+            transition: background 0.18s;
         }
 
-        .contact-form {
-            max-width: 600px;
-            margin: 2rem auto;
-            background: white;
+        .faq-btn:hover { background: rgba(255,255,255,0.018); }
+
+        .faq-q {
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .faq-icon {
+            font-family: var(--font-mono);
+            font-size: 1.15rem;
+            color: var(--amber);
+            line-height: 1;
+            transition: transform 0.22s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+        .faq-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.open .faq-body { max-height: 400px; }
+
+        .faq-answer {
+            padding: 0 1.5rem 1.2rem;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            line-height: 1.72;
+        }
+
+        .faq-answer code {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 0.12rem 0.35rem;
+            border-radius: 3px;
+            color: var(--teal);
+        }
+
+        /* ─── CONTACT PAGE ───────────────────────────────────── */
+        .contact-wrap { padding: 5.5rem 0; }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 4rem;
+            margin-top: 2.75rem;
+            align-items: start;
+        }
+
+        .contact-info h3 {
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+        }
+
+        .contact-info p {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.68;
+            margin-bottom: 1.75rem;
+        }
+
+        .contact-email-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem 1.2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-decoration: none;
+            transition: border-color 0.18s;
+        }
+
+        .contact-email-link:hover { border-color: var(--amber); }
+
+        .email-lbl {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--text-dimmer);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .email-val {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--teal);
+        }
+
+        .contact-form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.4rem; }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.67rem;
             font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 0.45rem;
         }
 
         input, textarea {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.72rem 1rem;
+            background: var(--surface-2);
             border: 1px solid var(--border);
             border-radius: 4px;
-            font-family: inherit;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.18s, box-shadow 0.18s;
+        }
+
+        input::placeholder, textarea::placeholder { color: var(--text-dimmer); }
+
+        input:focus, textarea:focus {
+            border-color: var(--amber);
+            box-shadow: 0 0 0 3px var(--amber-dim);
         }
 
         textarea {
-            min-height: 150px;
+            min-height: 130px;
             resize: vertical;
+            font-family: var(--font-sans);
         }
 
-        button {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
+        .form-submit {
+            width: 100%;
         }
 
-        button:hover {
-            background: var(--primary-dark);
-        }
-
+        /* ─── FOOTER ─────────────────────────────────────────── */
         footer {
-            background: var(--dark);
-            color: white;
-            text-align: center;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
             padding: 2rem;
-            margin-top: 4rem;
         }
 
-        code {
-            background: #f3f4f6;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        pre {
-            background: #1f2937;
-            color: #f9fafb;
-            padding: 1rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 1rem 0;
+        .footer-copy {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dimmer);
         }
 
-        .spec-link {
-            display: inline-block;
-            margin-top: 1rem;
-            color: var(--primary);
+        .footer-copy strong { color: var(--amber); font-weight: 600; }
+
+        .footer-link {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-dimmer);
             text-decoration: none;
-            font-weight: 500;
+            transition: color 0.18s;
         }
 
-        .spec-link:hover {
-            text-decoration: underline;
+        .footer-link:hover { color: var(--amber); }
+
+        /* ─── SCROLL REVEAL ──────────────────────────────────── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+
+        .reveal.in { opacity: 1; transform: translateY(0); }
+
+        /* ─── RESPONSIVE ─────────────────────────────────────── */
+        @media (max-width: 960px) {
+            .hero-inner { grid-template-columns: 1fr; }
+            .hero-right { display: none; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .feature-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-layout { grid-template-columns: 1fr; padding: 4rem 2rem; }
+            .about-layout { grid-template-columns: 1fr; }
+            .about-toc { display: none; }
+            .about-body { padding-top: 0; }
+            .contact-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            nav a { padding: 0.45rem 0.7rem; font-size: 0.66rem; letter-spacing: 0.06em; }
+            .hero { padding: 3.5rem 1.5rem; }
+            .hero h1 { font-size: 3.5rem; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .stat-item { padding: 1.25rem; }
+            .feature-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
+
     <nav>
-        <div class="container">
-            <div class="logo">CSV<span>++</span></div>
+        <div class="nav-inner">
+            <div class="logo" data-page="home">CSV<span class="logo-plus">++</span></div>
             <ul>
                 <li><a href="#" data-page="home">Home</a></li>
                 <li><a href="#" data-page="about">About</a></li>
@@ -274,385 +975,524 @@
         </div>
     </nav>
 
-    <!-- HOME PAGE -->
+    <!-- ═══════════════════════════════════ HOME PAGE -->
     <div id="home-page" class="page-content active">
-        <section class="hero">
-            <h1>CSV++ (CSV Plus Plus)</h1>
-            <p>Bringing hierarchical data to CSV while maintaining backward compatibility</p>
-            <a href="#" class="cta-button" data-page="about">Learn More</a>
-        </section>
 
-        <section class="container">
-            <h2 style="text-align: center;">The Power of CSV with Structure</h2>
-            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">
-                CSV++ extends the familiar CSV format to support repeating fields and nested structures, 
-                enabling you to represent complex real-world data while preserving CSV's simplicity and readability.
-            </p>
-
-            <div class="graph-container">
-                <canvas id="comparisonChart"></canvas>
+        <div class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-inner">
+                <div class="hero-left">
+                    <div class="eyebrow">IETF Internet-Draft &middot; draft-mscaldas-csvpp-02</div>
+                    <h1>CSV<span class="h1-plus">++</span></h1>
+                    <p class="hero-desc">
+                        An extension to RFC&nbsp;4180 that adds arrays and nested structures
+                        to CSV — while remaining fully compatible with every existing CSV parser.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#" class="btn-primary" data-page="about">Learn More</a>
+                        <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" class="btn-ghost" target="_blank">IETF Draft</a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="code-window">
+                        <div class="code-bar">
+                            <div class="dot dot-r"></div>
+                            <div class="dot dot-y"></div>
+                            <div class="dot dot-g"></div>
+                            <div class="code-bar-title">contacts.csvpp</div>
+                        </div>
+                        <div class="code-body">
+                            <code id="hero-code"></code>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <section class="features">
-            <div class="container">
-                <h2 style="text-align: center;">Why CSV++?</h2>
+        <div class="stats-strip">
+            <div class="stats-inner">
+                <div class="stat-item">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Delimiter levels</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Backward compatible</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">RFC</div>
+                    <div class="stat-label">IETF standard track</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">UTF-8</div>
+                    <div class="stat-label">Default encoding</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-layout">
+                <div class="reveal">
+                    <div class="section-label">Format Comparison</div>
+                    <h2>Where CSV++ fits in</h2>
+                    <p class="section-desc">
+                        The sweet spot between flat CSV and fully hierarchical formats —
+                        bringing structure without sacrificing simplicity or compatibility.
+                    </p>
+                    <div class="chart-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background:#f0a030"></div>CSV++</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#1fd4a8"></div>JSON</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#c792ea"></div>XML</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#50607a"></div>CSV</div>
+                    </div>
+                </div>
+                <div class="chart-wrap reveal">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <div class="container reveal">
+                <div class="section-label">Why CSV++</div>
+                <h2>Built for real-world data</h2>
+                <p class="section-desc">
+                    The CSV format you already know, extended to handle the complexity of modern datasets.
+                </p>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h3>📊 Backward Compatible</h3>
-                        <p>Standard CSV parsers can read CSV++ files. Your existing tools still work.</p>
+                        <span class="f-icon">◈</span>
+                        <h3>Backward Compatible</h3>
+                        <p>Standard CSV parsers read CSV++ files without errors. Your existing toolchain works from day one.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>🔄 Hierarchical Data</h3>
-                        <p>Support for arrays and nested structures without the complexity of JSON or XML.</p>
+                        <span class="f-icon">⬡</span>
+                        <h3>Hierarchical Data</h3>
+                        <p>Arrays and nested structures compose recursively. Represent real-world data without JSON's verbosity.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>📝 Self-Documenting</h3>
-                        <p>Structure is declared in column headers, making files human-readable and self-explanatory.</p>
+                        <span class="f-icon">◎</span>
+                        <h3>Self-Documenting</h3>
+                        <p>Structure is declared in column headers — files are human-readable with no external schema needed.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>🎯 Simple Syntax</h3>
-                        <p>Use square brackets for arrays, parentheses for structures. Intuitive and declarative.</p>
+                        <span class="f-icon">◻</span>
+                        <h3>Simple Syntax</h3>
+                        <p><code>field[]</code> for arrays, <code>field^(a^b)</code> for structures. Declarative and intuitive.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>⚡ Efficient</h3>
-                        <p>Columnar format avoids repeating field names in every record, saving bandwidth.</p>
+                        <span class="f-icon">⟡</span>
+                        <h3>Bandwidth Efficient</h3>
+                        <p>Columnar format avoids repeating field names in every record. Smaller files than JSON or XML.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>🛠️ Practical</h3>
-                        <p>Perfect for moderately structured data that needs both machine and human readability.</p>
+                        <span class="f-icon">⬟</span>
+                        <h3>IETF Standardized</h3>
+                        <p>Formally specified as an IETF Internet-Draft — interoperable, unambiguous, and implementation-ready.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="container">
-            <h2 style="text-align: center;">Quick Example</h2>
-            <pre>
-id,name,phones[|],address^(street^city^state^zip)
-1,John,555-1234|555-5678,123 Main St^Los Angeles^CA^90210
-2,Jane,555-4444,789 Pine St^Boston^MA^02101</pre>
-            <p style="text-align: center; margin-top: 1rem;">
-                This simple example shows multiple phone numbers and structured addresses in a CSV file.
-            </p>
+        <section class="example-section">
+            <div class="container reveal">
+                <div class="section-label">Quick Example</div>
+                <h2>See it in action</h2>
+                <p class="section-desc">
+                    Multiple phone numbers and structured addresses in a single, readable CSV file.
+                </p>
+                <pre><span class="t-cmt"># Column headers declare the structure of each field</span>
+<span class="t-hdr">id</span>,<span class="t-hdr">name</span>,<span class="t-arr">phones[]</span>,<span class="t-str">address^(street^city^state^zip)</span>
+<span class="t-num">1</span>,<span class="t-val">John Smith</span>,<span class="t-arr">555-1234~555-5678</span>,<span class="t-str">123 Main St^Los Angeles^CA^90210</span>
+<span class="t-num">2</span>,<span class="t-val">Jane Doe</span>,<span class="t-arr">555-4444</span>,<span class="t-str">789 Pine St^Boston^MA^02101</span></pre>
+                <p class="example-note">
+                    <code>phones[]</code> declares a tilde-delimited array field.
+                    <code>address^(&hellip;)</code> declares a caret-separated structured field.
+                    Standard CSV parsers read this file without modification.
+                </p>
+            </div>
         </section>
+
     </div>
 
-    <!-- ABOUT PAGE -->
+    <!-- ═══════════════════════════════════ ABOUT PAGE -->
     <div id="about-page" class="page-content">
-        <section class="container" style="padding-top: 6rem;">
-            <h2>About CSV++</h2>
-            <p style="margin-bottom: 2rem;">
-                CSV++ (CSV Plus Plus) is an extension to the Comma-Separated Values (CSV) format defined in 
-                RFC 4180. It adds support for repeating fields (one-to-many relationships) and hierarchical 
-                component structures while maintaining backward compatibility with standard CSV parsers.
-            </p>
+        <div class="container">
+            <div class="about-layout">
+                <div class="about-toc">
+                    <div class="toc-heading">On this page</div>
+                    <ul class="toc-nav">
+                        <li><a href="#about-overview">Overview</a></li>
+                        <li><a href="#about-problem">The Problem</a></li>
+                        <li><a href="#about-solution">The Solution</a></li>
+                        <li><a href="#about-principles">Design Principles</a></li>
+                        <li><a href="#about-when">When to Use</a></li>
+                    </ul>
+                </div>
+                <div class="about-body">
+                    <div class="section-label">About</div>
+                    <h2 id="about-overview">CSV++ (CSV Plus Plus)</h2>
+                    <p>
+                        CSV++ is an extension to the Comma-Separated Values format defined in RFC&nbsp;4180.
+                        It adds support for repeating fields (one-to-many relationships) and hierarchical
+                        component structures while maintaining backward compatibility with standard CSV parsers.
+                    </p>
 
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">The Problem</h3>
-            <p>
-                Traditional CSV files excel at representing flat, tabular data. However, real-world data often contains:
-            </p>
-            <ul style="margin-left: 2rem; margin-top: 1rem;">
-                <li>Repeated values (e.g., multiple phone numbers for one person)</li>
-                <li>Structured components (e.g., addresses with street, city, state, zip)</li>
-                <li>Nested hierarchies (e.g., addresses with multiple address lines)</li>
-            </ul>
+                    <h3 id="about-problem">The Problem</h3>
+                    <p>Traditional CSV excels at flat, tabular data. But real-world data often contains:</p>
+                    <ul>
+                        <li>Repeated values — e.g., multiple phone numbers per person</li>
+                        <li>Structured components — e.g., addresses with street, city, state, zip</li>
+                        <li>Nested hierarchies — e.g., multiple structured addresses per record</li>
+                    </ul>
 
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">The Solution</h3>
-            <p>
-                While formats like JSON, XML, and YAML excel at representing hierarchical data, they introduce 
-                complexity and redundancy that may not be warranted for moderately structured datasets. CSV++ 
-                occupies a middle ground by extending CSV's tabular simplicity with hierarchical capabilities.
-            </p>
+                    <h3 id="about-solution">The Solution</h3>
+                    <p>
+                        Formats like JSON, XML, and YAML represent hierarchical data well — but introduce
+                        complexity and redundancy that may not be warranted for moderately structured datasets.
+                        CSV++ occupies the middle ground: extending CSV's tabular simplicity with hierarchical
+                        capabilities.
+                    </p>
+                    <p>
+                        Structure is declared in column headers using a minimal syntax:
+                        <code>field[]</code> for arrays, <code>field^(comp1^comp2)</code> for structured fields.
+                        Data uses configurable delimiters chosen to avoid conflicts with common data.
+                    </p>
 
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">Design Principles</h3>
-            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <ol style="margin-left: 2rem;">
-                    <li><strong>Backward Compatibility:</strong> Standard CSV parsers can read CSV++ files</li>
-                    <li><strong>Self-Documenting:</strong> Structure is defined in column headers</li>
-                    <li><strong>Tabular Readability:</strong> Data maintains a tabular layout suitable for spreadsheets</li>
-                    <li><strong>Explicit Over Implicit:</strong> Delimiters are declared, not assumed</li>
-                    <li><strong>Recursively Composable:</strong> Structures can nest to any depth (though 3-4 levels recommended)</li>
-                </ol>
+                    <h3 id="about-principles">Design Principles</h3>
+                    <div class="principle-list">
+                        <div class="principle-row">
+                            <div class="p-num">01</div>
+                            <div class="p-text"><strong>Backward Compatibility</strong> — Standard CSV parsers can read CSV++ files without modification</div>
+                        </div>
+                        <div class="principle-row">
+                            <div class="p-num">02</div>
+                            <div class="p-text"><strong>Self-Documenting</strong> — Structure is entirely defined in column headers</div>
+                        </div>
+                        <div class="principle-row">
+                            <div class="p-num">03</div>
+                            <div class="p-text"><strong>Tabular Readability</strong> — Data maintains a tabular layout suitable for spreadsheets</div>
+                        </div>
+                        <div class="principle-row">
+                            <div class="p-num">04</div>
+                            <div class="p-text"><strong>Explicit Over Implicit</strong> — Delimiters are declared, not assumed</div>
+                        </div>
+                        <div class="principle-row">
+                            <div class="p-num">05</div>
+                            <div class="p-text"><strong>Recursively Composable</strong> — Structures nest to any depth; 3–4 levels recommended</div>
+                        </div>
+                    </div>
+
+                    <h3 id="about-when">When to Use CSV++</h3>
+                    <p>CSV++ is most appropriate for:</p>
+                    <ul>
+                        <li>Moderately structured data (1–3 levels of nesting)</li>
+                        <li>Environments where CSV is the established interchange format</li>
+                        <li>Scenarios requiring backward compatibility with existing CSV infrastructure</li>
+                        <li>Applications that benefit from self-documenting tabular data</li>
+                        <li>Large datasets where file size and bandwidth matter</li>
+                    </ul>
+                    <p style="margin-top:1rem; font-size:0.83rem; color:var(--text-dimmer);">
+                        Note: for deeply nested hierarchical data (4+ levels), document-oriented formats
+                        like JSON or XML may provide better readability and tooling support.
+                    </p>
+
+                    <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" class="spec-cta" target="_blank">
+                        <span>&rarr; Read the Full Specification — draft-mscaldas-csvpp-02 (IETF Datatracker)</span>
+                    </a>
+                </div>
             </div>
-
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary);">When to Use CSV++</h3>
-            <p>CSV++ is most appropriate for:</p>
-            <ul style="margin-left: 2rem; margin-top: 1rem;">
-                <li>Moderately structured data (1-3 levels of nesting)</li>
-                <li>Environments where CSV is already the established interchange format</li>
-                <li>Scenarios requiring backward compatibility with existing CSV infrastructure</li>
-                <li>Applications that benefit from self-documenting tabular data</li>
-                <li>Large datasets where file size and bandwidth matter</li>
-            </ul>
-
-            <p style="margin-top: 2rem;">
-                <strong>Note:</strong> For deeply nested hierarchical data (4+ levels), document-oriented formats 
-                like JSON or XML may provide better readability and tooling support.
-            </p>
-
-            <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" class="spec-link" target="_blank">
-                📄 Read the Full Specification (IETF Draft)
-            </a>
-        </section>
+        </div>
     </div>
 
-    <!-- FAQ PAGE -->
+    <!-- ═══════════════════════════════════ FAQ PAGE -->
     <div id="faq-page" class="page-content">
-        <section class="container" style="padding-top: 6rem;">
+        <div class="container faq-wrap">
+            <div class="section-label">FAQ</div>
             <h2>Frequently Asked Questions</h2>
-
-            <div class="faq-item">
-                <h3>What is CSV++?</h3>
-                <p>CSV++ is an extension to the standard CSV format (RFC 4180) that adds support for arrays and nested structures while maintaining full backward compatibility with existing CSV parsers.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Is CSV++ compatible with regular CSV?</h3>
-                <p>Yes! CSV++ files are valid CSV files. Standard CSV parsers can open them, though they won't interpret the enhanced structure. The structure is encoded in the column headers using special syntax.</p>
-            </div>
-            <div class="faq-item">
-                <h3>When should I use CSV++ instead of JSON or XML?</h3>
-                <p>Use CSV++ when you need moderately structured data in a tabular format that's both human-readable and machine-parseable, especially when working with existing CSV-based systems or when file size matters.</p>
-            </div>
-            <div class="faq-item">
-                <h3>How do I create arrays in CSV++?</h3>
-                <p>Use square brackets in the header with a delimiter: <code>phone[|]</code> means the phone field contains multiple values separated by the pipe character. Empty brackets <code>[]</code> use the default delimiter (~).</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>How do I create structured fields?</h3>
-                <p>Use parentheses to define components: <code>address^(street^city^state^zip)</code> creates an address structure with four components separated by the caret (^) character.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Can I combine arrays and structures?</h3>
-                <p>Absolutely! You can have arrays of structures: <code>address[~]^(street^city^state^zip)</code> represents multiple addresses, each with structured components.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>What delimiters should I use?</h3>
-                <p>The specification recommends: ~ (tilde) for array values, ^ (caret) for structure components, ; (semicolon) for nested arrays, and : (colon) for deeply nested structures. You can use any character that doesn't conflict with your data.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>How deep can I nest structures?</h3>
-                <p>Technically unlimited, but we recommend keeping it to 3-4 levels for readability. Beyond that, consider using JSON or XML instead.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>What file extension should I use?</h3>
-                <p>Use <code>.csv</code> for maximum compatibility. You can optionally use <code>.csvpp</code> or <code>.csvplus</code> to explicitly indicate CSV++ format.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Are there any parsers or libraries available?</h3>
-                <p>The specification is currently an IETF draft. We're working on reference implementations and welcome community contributions. Contact us if you're interested in contributing!</p>
-            </div>
-
-            
-        </section>
+            <div class="faq-list" id="faqList"></div>
+        </div>
     </div>
 
-    <!-- CONTACT PAGE -->
+    <!-- ═══════════════════════════════════ CONTACT PAGE -->
     <div id="contact-page" class="page-content">
-        <section class="container" style="padding-top: 6rem;">
-            <h2 style="text-align: center;">Contact Us</h2>
-            <p style="text-align: center; margin-bottom: 2rem;">
-                Have questions, feedback, or want to contribute? We'd love to hear from you!
-            </p>
-
-            <div class="contact-form">
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="name">Name *</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject">Subject *</label>
-                        <input type="text" id="subject" name="subject" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message">Message *</label>
-                        <textarea id="message" name="message" required></textarea>
-                    </div>
-
-                    <button type="submit">Send Message</button>
-                </form>
+        <div class="container contact-wrap">
+            <div class="section-label">Contact</div>
+            <h2>Get in touch</h2>
+            <div class="contact-layout">
+                <div class="contact-info">
+                    <h3>Questions or feedback?</h3>
+                    <p>
+                        Whether you're interested in implementing the spec, have questions about the
+                        format design, or want to contribute — we'd love to hear from you.
+                    </p>
+                    <a href="mailto:csvplusplus@gmail.com" class="contact-email-link">
+                        <div>
+                            <span class="email-lbl">Email</span>
+                            <span class="email-val">csvplusplus@gmail.com</span>
+                        </div>
+                    </a>
+                    <p style="margin-top:1.25rem; font-size:0.82rem; color:var(--text-dimmer);">
+                        You can also submit feedback through the IETF Datatracker or
+                        <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" style="color:var(--teal);text-decoration:none;">read the draft</a>.
+                    </p>
+                </div>
+                <div class="contact-form-card">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" placeholder="What's this about?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" placeholder="Your message..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary form-submit">Send Message</button>
+                    </form>
+                </div>
             </div>
-
-            <p style="text-align: center; margin-top: 2rem;">
-                You can also reach us directly at: 
-                <a href="mailto:csvplusplus@gmail.com" style="color: var(--primary);">csvplusplus@gmail.com</a>
-            </p>
-        </section>
+        </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 CSV++. An extension to RFC 4180 for hierarchical data.</p>
-        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
-            Draft Specification: <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" style="color: white;">draft-mscaldas-csvpp-00</a>
-        </p>
+        <div class="footer-inner">
+            <div class="footer-copy">
+                <strong>CSV++</strong> &mdash; An extension to RFC 4180 for hierarchical data &mdash; &copy; 2026
+            </div>
+            <a href="https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/" class="footer-link" target="_blank">
+                draft-mscaldas-csvpp-02
+            </a>
+        </div>
     </footer>
 
     <script>
-        // Navigation
-        document.querySelectorAll('[data-page]').forEach(link => {
-            link.addEventListener('click', (e) => {
+        // ── FAQ DATA ──────────────────────────────────────────────
+        const faqs = [
+            {
+                q: "What is CSV++?",
+                a: "CSV++ is an extension to the standard CSV format (RFC 4180) that adds support for arrays and nested structures while maintaining full backward compatibility with existing CSV parsers."
+            },
+            {
+                q: "Is CSV++ compatible with regular CSV parsers?",
+                a: "Yes. CSV++ files are valid CSV files. Standard parsers open them without errors — they simply won't interpret the enhanced structure. Structure is encoded in the column headers, which appear as ordinary strings to unaware parsers."
+            },
+            {
+                q: "When should I use CSV++ instead of JSON or XML?",
+                a: "Use CSV++ when you need moderately structured data in a tabular format that's both human-readable and machine-parseable — especially in CSV-based systems or when file size matters."
+            },
+            {
+                q: "How do I create arrays in CSV++?",
+                a: "Use square brackets in the header: <code>phones[]</code> means the field contains multiple values separated by the default tilde (~) delimiter. Specify a custom delimiter: <code>phones[|]</code> uses pipe instead."
+            },
+            {
+                q: "How do I create structured fields?",
+                a: "Use parentheses to define components: <code>address^(street^city^state^zip)</code> creates an address structure with four caret-separated components."
+            },
+            {
+                q: "Can I combine arrays and structures?",
+                a: "Absolutely. You can have arrays of structures: <code>address[]^(street^city^state^zip)</code> represents multiple addresses, each with structured components."
+            },
+            {
+                q: "What delimiters should I use?",
+                a: "The spec recommends: <code>~</code> (tilde) for array values, <code>^</code> (caret) for components, <code>;</code> for nested arrays, and <code>:</code> for deeper nesting. These avoid conflicts with common shell, SQL, and CSV control characters."
+            },
+            {
+                q: "How deep can I nest structures?",
+                a: "Technically unlimited, but the spec recommends 3–4 levels for readability. Beyond that, consider JSON or XML."
+            },
+            {
+                q: "What file extension should I use?",
+                a: "Use <code>.csv</code> for maximum compatibility. You may use <code>.csvpp</code> to explicitly signal CSV++ format."
+            },
+            {
+                q: "Are there any parsers or libraries available?",
+                a: "The specification is currently an IETF draft. Reference implementations are in progress. Contact us if you're interested in contributing or building a parser."
+            }
+        ];
+
+        const faqList = document.getElementById('faqList');
+        faqs.forEach(faq => {
+            const item = document.createElement('div');
+            item.className = 'faq-item';
+            item.innerHTML = `
+                <button class="faq-btn" aria-expanded="false">
+                    <span class="faq-q">${faq.q}</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-body">
+                    <div class="faq-answer">${faq.a}</div>
+                </div>`;
+            item.querySelector('.faq-btn').addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+                if (!isOpen) item.classList.add('open');
+            });
+            faqList.appendChild(item);
+        });
+
+        // ── HERO CODE ANIMATION ───────────────────────────────────
+        const heroLines = [
+            `<span class="t-cmt"># contacts.csvpp</span>`,
+            `<span class="t-hdr">id</span>,<span class="t-hdr">name</span>,<span class="t-arr">phones[]</span>,<span class="t-str">address^(street^city^state^zip)</span>`,
+            `<span class="t-num">1</span>,<span class="t-val">John Smith</span>,<span class="t-arr">555-1234~555-5678</span>,<span class="t-str">123 Main St^San Francisco^CA^94102</span>`,
+            `<span class="t-num">2</span>,<span class="t-val">Jane Doe</span>,<span class="t-arr">555-4444</span>,<span class="t-str">789 Pine St^Boston^MA^02101</span>`,
+            `<span class="t-num">3</span>,<span class="t-val">Alex Chen</span>,<span class="t-arr">555-9999~555-0001~555-0002</span>,<span class="t-str">42 Oak Ave^Chicago^IL^60601</span>`
+        ];
+
+        const heroCode = document.getElementById('hero-code');
+        let li = 0;
+        function nextLine() {
+            if (li >= heroLines.length) return;
+            const span = document.createElement('span');
+            span.className = 'code-line';
+            span.innerHTML = heroLines[li++];
+            heroCode.appendChild(span);
+            requestAnimationFrame(() => requestAnimationFrame(() => span.classList.add('shown')));
+            setTimeout(nextLine, 220);
+        }
+        setTimeout(nextLine, 700);
+
+        // ── NAVIGATION ────────────────────────────────────────────
+        function showPage(name) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            const el = document.getElementById(name + '-page');
+            if (el) el.classList.add('active');
+            document.querySelectorAll(`[data-page="${name}"]`).forEach(el => el.classList.add('active'));
+            window.scrollTo(0, 0);
+            setTimeout(checkReveal, 80);
+        }
+
+        document.querySelectorAll('[data-page]').forEach(el => {
+            el.addEventListener('click', e => {
                 e.preventDefault();
-                const page = e.target.getAttribute('data-page');
-                
-                // Hide all pages
-                document.querySelectorAll('.page-content').forEach(p => {
-                    p.classList.remove('active');
-                });
-                
-                // Show selected page
-                document.getElementById(page + '-page').classList.add('active');
-                
-                // Scroll to top
-                window.scrollTo(0, 0);
+                showPage(e.currentTarget.getAttribute('data-page'));
             });
         });
 
-        // Contact form
-        document.getElementById('contactForm').addEventListener('submit', (e) => {
+        document.querySelector('nav a[data-page="home"]').classList.add('active');
+
+        // ── SCROLL REVEAL ─────────────────────────────────────────
+        function checkReveal() {
+            document.querySelectorAll('.reveal').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight * 0.92) {
+                    el.classList.add('in');
+                }
+            });
+        }
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+        }, { threshold: 0.08 });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ── CONTACT FORM ──────────────────────────────────────────
+        document.getElementById('contactForm').addEventListener('submit', e => {
             e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            
-            const subject = encodeURIComponent(data.subject);
-            const body = encodeURIComponent(
-                `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`
-            );
-            
+            const d = Object.fromEntries(new FormData(e.target));
+            const subject = encodeURIComponent(d.subject);
+            const body = encodeURIComponent(`Name: ${d.name}\nEmail: ${d.email}\n\nMessage:\n${d.message}`);
             window.location.href = `mailto:csvplusplus@gmail.com?subject=${subject}&body=${body}`;
-            
             alert('Your email client will open with the message. Please send it from there.');
         });
 
-        // Chart
+        // ── RADAR CHART ───────────────────────────────────────────
         const canvas = document.getElementById('comparisonChart');
         const ctx = canvas.getContext('2d');
-        
-        // Set canvas size
-        canvas.width = 700;
-        canvas.height = 450;
-        
-        // Data
-        const data = {
-            labels: ['Simplicity', 'Hierarchy', 'File Size', 'Tooling', 'Human Readable'],
-            csv: [95, 20, 100, 100, 90],
-            csvpp: [85, 75, 95, 70, 85],
-            json: [60, 100, 70, 95, 70],
-            xml: [50, 100, 60, 90, 50]
+        canvas.width = 440;
+        canvas.height = 390;
+
+        const chartData = {
+            labels: ['Simplicity', 'Hierarchy', 'File Size', 'Tooling', 'Human\nReadable'],
+            csv:   [95, 20, 100, 100, 90],
+            csvpp: [85, 75, 95,  70,  85],
+            json:  [60, 100, 70, 95,  70],
+            xml:   [50, 100, 60, 90,  50]
         };
-        
-        // Draw radar chart
-        function drawRadarChart() {
-            const centerX = canvas.width / 2;
-            const centerY = 200;
-            const radius = 150;
-            const sides = data.labels.length;
-            
+
+        const cx = canvas.width / 2;
+        const cy = 185;
+        const R  = 128;
+        const N  = chartData.labels.length;
+
+        function point(i, pct) {
+            const a = (i * 2 * Math.PI) / N - Math.PI / 2;
+            return [cx + Math.cos(a) * R * pct, cy + Math.sin(a) * R * pct];
+        }
+
+        function drawChart() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw grid circles
-            ctx.strokeStyle = '#e5e7eb';
-            ctx.lineWidth = 1;
-            for (let i = 1; i <= 5; i++) {
+
+            // grid rings
+            for (let r = 1; r <= 5; r++) {
                 ctx.beginPath();
-                for (let j = 0; j <= sides; j++) {
-                    const angle = (j * 2 * Math.PI) / sides - Math.PI / 2;
-                    const x = centerX + Math.cos(angle) * (radius * i / 5);
-                    const y = centerY + Math.sin(angle) * (radius * i / 5);
-                    if (j === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
+                for (let i = 0; i <= N; i++) {
+                    const [x, y] = point(i % N, r / 5);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
                 }
                 ctx.closePath();
+                ctx.strokeStyle = r === 5 ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)';
+                ctx.lineWidth = 1;
                 ctx.stroke();
             }
-            
-            // Draw axes
-            ctx.strokeStyle = '#d1d5db';
-            for (let i = 0; i < sides; i++) {
-                const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+
+            // axes
+            for (let i = 0; i < N; i++) {
+                const [x, y] = point(i, 1);
                 ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.lineTo(
-                    centerX + Math.cos(angle) * radius,
-                    centerY + Math.sin(angle) * radius
-                );
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+                ctx.lineWidth = 1;
                 ctx.stroke();
             }
-            
-            // Draw labels
-            ctx.fillStyle = '#374151';
-            ctx.font = 'bold 14px sans-serif';
+
+            // labels
+            ctx.font = '600 10.5px "IBM Plex Mono", monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            for (let i = 0; i < sides; i++) {
-                const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
-                const x = centerX + Math.cos(angle) * (radius + 30);
-                const y = centerY + Math.sin(angle) * (radius + 30);
-                ctx.fillText(data.labels[i], x, y);
+            for (let i = 0; i < N; i++) {
+                const [x, y] = point(i, 1.22);
+                ctx.fillStyle = 'rgba(107,122,144,0.95)';
+                const lines = chartData.labels[i].split('\n');
+                if (lines.length > 1) {
+                    lines.forEach((l, li) => ctx.fillText(l, x, y + (li - 0.5) * 13));
+                } else {
+                    ctx.fillText(chartData.labels[i], x, y);
+                }
             }
-            
-            // Draw data series
+
+            // series — draw CSV last so CSV++ renders on top
             const series = [
-                { name: 'CSV++', data: data.csvpp, color: '#2563eb', fill: 'rgba(37, 99, 235, 0.2)' },
-                { name: 'JSON', data: data.json, color: '#10b981', fill: 'rgba(16, 185, 129, 0.1)' },
-                { name: 'XML', data: data.xml, color: '#f59e0b', fill: 'rgba(245, 158, 11, 0.1)' },
-                { name: 'CSV', data: data.csv, color: '#8b5cf6', fill: 'rgba(139, 92, 246, 0.1)' }
+                { d: chartData.csv,   color: '#50607a', fill: 'rgba(80,96,122,0.07)' },
+                { d: chartData.xml,   color: '#c792ea', fill: 'rgba(199,146,234,0.08)' },
+                { d: chartData.json,  color: '#1fd4a8', fill: 'rgba(31,212,168,0.09)' },
+                { d: chartData.csvpp, color: '#f0a030', fill: 'rgba(240,160,48,0.16)',  bold: true }
             ];
-            
+
             series.forEach(s => {
                 ctx.beginPath();
-                for (let i = 0; i <= sides; i++) {
-                    const idx = i % sides;
-                    const value = s.data[idx] / 100;
-                    const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
-                    const x = centerX + Math.cos(angle) * (radius * value);
-                    const y = centerY + Math.sin(angle) * (radius * value);
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
+                for (let i = 0; i <= N; i++) {
+                    const [x, y] = point(i % N, s.d[i % N] / 100);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
                 }
                 ctx.closePath();
                 ctx.fillStyle = s.fill;
                 ctx.fill();
                 ctx.strokeStyle = s.color;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = s.bold ? 2.5 : 1.5;
                 ctx.stroke();
             });
-            
-            // Draw legend
-            const legendX = 150;
-            const legendY = canvas.height - 40;
-            series.forEach((s, i) => {
-                ctx.fillStyle = s.color;
-                ctx.fillRect(legendX + i * 100, legendY, 15, 15);
-                ctx.fillStyle = '#374151';
-                ctx.font = '12px sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText(s.name, legendX + i * 100 + 20, legendY + 11);
-            });
         }
-        
-        drawRadarChart();
+
+        drawChart();
     </script>
 </body>
 </html>
