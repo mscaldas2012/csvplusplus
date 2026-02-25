@@ -34,7 +34,7 @@
       </address>
     </author>
     
-    <date year="2026" month="February" day="19"/>
+    <date year="2026" month="February" day="25"/>
     
     <area>Applications</area>
     <workgroup>Independent Submission</workgroup>
@@ -302,7 +302,7 @@ id,location^(name^coords:(lat:lon))
       <section anchor="quoting-leaf">
         <name>Leaf Elements</name>
         <t>A <strong>leaf element</strong> is a value that will not be further split by any array
-        or component delimiter — it is the innermost atomic unit at its position in the CSV++
+        or component delimiter -- it is the innermost atomic unit at its position in the CSV++
         hierarchy. Examples of leaf elements:</t>
         <ul>
           <li>The value of a simple field</li>
