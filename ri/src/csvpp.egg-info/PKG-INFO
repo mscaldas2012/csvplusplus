@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: csvpp
+Version: 0.1.0
+Summary: CSV++ reference implementation — RFC extension for hierarchical data
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"

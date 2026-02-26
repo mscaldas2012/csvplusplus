@@ -1,0 +1,2 @@
+id,name,address[~]^(type^lines[;]^city^state^zip)
+1,John,home^123 Main;Apt 4^LA^CA^90210~work^456 Oak^NY^NY^10001

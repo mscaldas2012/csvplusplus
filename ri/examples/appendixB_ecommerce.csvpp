@@ -1,0 +1,2 @@
+id,cust,items[~]^(sku^name^qty^price^opts[;]:(k:v))
+1,Alice,S1^Shirt^2^20^sz:M;col:blu~S2^Pant^1^50^sz:32
