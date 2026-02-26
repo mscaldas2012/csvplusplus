@@ -49,6 +49,7 @@ class TestNoCrash:
     def test_simple_fields(self):
         out = render(parse(SIMPLE_CSV))
         assert len(out) > 0
+       
 
     def test_array_fields(self):
         out = render(parse(ARRAY_CSV))
