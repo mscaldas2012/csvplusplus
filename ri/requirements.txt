@@ -1,0 +1,6 @@
+# Runtime dependencies
+# None — csvpp uses only the Python standard library (csv, io, re, warnings, pathlib).
+
+# Test / development dependencies
+pytest>=8
+pytest-cov

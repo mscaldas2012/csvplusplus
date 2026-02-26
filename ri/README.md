@@ -33,15 +33,119 @@ records = csvpp.parse_file("examples/appendixB_ecommerce.csvpp")
 
 ## Installation
 
+The library has **no runtime dependencies** — it uses only the Python standard library.
+Test tooling (`pytest`, `pytest-cov`) is listed in `requirements.txt`.
+
 ```bash
-python -m venv .venv && source .venv/bin/activate
+# 1. Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate          # macOS / Linux
+# .venv\Scripts\activate           # Windows
+
+# 2a. Install with pip (editable, includes test deps)
 pip install -e ".[dev]"
+
+# 2b. Or install test deps directly from requirements.txt
+pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Running Tests
 
 ```bash
+# Run all 88 tests
 pytest
+
+# Run with coverage report
+pytest --cov=csvpp --cov-report=term-missing
+
+# Run a specific test file
+pytest tests/test_examples.py
+
+# Run a specific test class or case
+pytest tests/test_examples.py::TestAppendixBEcommerce
+pytest tests/test_examples.py::TestAppendixBEcommerce::test_shirt
+```
+
+## Using the Library
+
+### Parsing a string
+
+```python
+import csvpp
+
+# Simple fields — values are plain strings
+records = csvpp.parse("id,name\n1,Alice\n2,Bob\n")
+# [{"id": "1", "name": "Alice"}, {"id": "2", "name": "Bob"}]
+
+# Array fields — values are lists
+records = csvpp.parse("""id,name,phone[|],email[;]
+1,John,555-1234|555-5678|555-9012,john@work.com;john@home.com
+2,Jane,555-4444,jane@company.com
+""")
+records[0]["phone"]   # ["555-1234", "555-5678", "555-9012"]
+records[1]["email"]   # ["jane@company.com"]
+
+# Structured fields — values are dicts
+records = csvpp.parse("""id,name,geo^(lat^lon)
+1,Location A,34.0522^-118.2437
+""")
+records[0]["geo"]     # {"lat": "34.0522", "lon": "-118.2437"}
+
+# Array of structures
+records = csvpp.parse("""id,name,address[~]^(street^city^state^zip)
+1,John,123 Main St^Los Angeles^CA^90210~456 Oak Ave^New York^NY^10001
+""")
+records[0]["address"][0]  # {"street": "123 Main St", "city": "Los Angeles", "state": "CA", "zip": "90210"}
+records[0]["address"][1]  # {"street": "456 Oak Ave", "city": "New York", "state": "NY", "zip": "10001"}
+
+# Complex nesting (array within struct, struct within struct)
+records = csvpp.parse("""id,cust,items[~]^(sku^name^qty^price^opts[;]:(k:v))
+1,Alice,S1^Shirt^2^20^sz:M;col:blu~S2^Pant^1^50^sz:32
+""")
+records[0]["items"][0]
+# {"sku": "S1", "name": "Shirt", "qty": "2", "price": "20",
+#  "opts": [{"k": "sz", "v": "M"}, {"k": "col", "v": "blu"}]}
+```
+
+### Parsing a file
+
+```python
+import csvpp
+
+records = csvpp.parse_file("examples/appendixB_ecommerce.csvpp")
+```
+
+### Working with field schemas directly
+
+```python
+from csvpp import parse_field, parse_header_row
+
+# Parse a single header
+field = parse_field("address[~]^(street^city^state^zip)")
+# ArrayField('address', delimiter='~',
+#   element_type=StructField('address', component_delimiter='^',
+#     components=[SimpleField('street'), SimpleField('city'), ...]))
+
+# Parse a full header row
+schemas = parse_header_row(["id", "phone[|]", "address[~]^(street^city)"])
+```
+
+### Error handling
+
+```python
+import csvpp
+
+try:
+    records = csvpp.parse(my_csv_text)
+except csvpp.HeaderParseError as e:
+    print(f"Bad column header: {e}")
+except csvpp.DelimiterConflictError as e:
+    print(f"Reused delimiter: {e}")
+except csvpp.InvalidQuotingError as e:
+    print(f"Non-leaf element was quoted: {e}")
+except csvpp.CSVPPError as e:
+    print(f"Other CSV++ error: {e}")
 ```
 
 ## Project Structure
