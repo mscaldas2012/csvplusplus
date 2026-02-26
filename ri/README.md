@@ -116,6 +116,88 @@ import csvpp
 records = csvpp.parse_file("examples/appendixB_ecommerce.csvpp")
 ```
 
+### Pretty-printing records
+
+`csvpp.pprint()` renders any parsed result with aligned keys, box borders, and
+recursive indentation for arrays and nested structs.  Use `top=N` to cap the
+number of rows displayed.
+
+```python
+import csvpp
+
+records = csvpp.parse_file("examples/figure5_repeated_structs.csvpp")
+csvpp.pprint(records)           # all records, ANSI colour if terminal
+csvpp.pprint(records, top=1)    # first record only
+csvpp.pprint(records, color=False)  # plain text (no ANSI escape codes)
+```
+
+**Example output** — `figure5_repeated_structs.csvpp` (array of structs):
+
+```
+┌ Record 1/2 ────────────────────────────────────────────────┐
+│ id       1
+│ name     John
+│ address  [0] street  123 Main St
+│              city    Los Angeles
+│              state   CA
+│              zip     90210
+│          [1] street  456 Oak Ave
+│              city    New York
+│              state   NY
+│              zip     10001
+└────────────────────────────────────────────────────────────┘
+
+┌ Record 2/2 ────────────────────────────────────────────────┐
+│ id       2
+│ name     Jane
+│ address  [0] street  789 Pine St
+│              city    Boston
+│              state   MA
+│              zip     02101
+└────────────────────────────────────────────────────────────┘
+```
+
+**Example output** — `appendixB_ecommerce.csvpp` (4-level nesting):
+
+```
+┌ Record 1/1 ────────────────────────────────────────────────┐
+│ id     1
+│ cust   Alice
+│ items  [0] sku    S1
+│            name   Shirt
+│            qty    2
+│            price  20
+│            opts   [0] k  sz
+│                       v  M
+│                   [1] k  col
+│                       v  blu
+│        [1] sku    S2
+│            name   Pant
+│            qty    1
+│            price  50
+│            opts   [0] k  sz
+│                       v  32
+└────────────────────────────────────────────────────────────┘
+```
+
+**`top=N`** — shows N records and prints an omission note:
+
+```
+┌ Record 1/5 ───...
+...
+┌ Record 2/5 ───...
+...
+
+Showing 2 of 5 records (3 omitted). Pass top=5 to see all.
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `records` | `list[dict]` | — | Output of `parse()` / `parse_file()` |
+| `top` | `int \| None` | `None` | Max rows to display; `None` = all |
+| `file` | `TextIO` | `sys.stdout` | Output stream |
+| `color` | `bool \| None` | `None` | ANSI colour: `True`/`False`/auto-detect |
+
 ### Working with field schemas directly
 
 ```python

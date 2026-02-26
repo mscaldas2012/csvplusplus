@@ -18,6 +18,7 @@ Quick start:
 
 from .parser import parse, parse_file
 from .header_parser import parse_field, parse_header_row
+from .pprint import pprint
 from .models import (
     Field,
     SimpleField,
@@ -34,6 +35,7 @@ from .models import (
 __all__ = [
     "parse",
     "parse_file",
+    "pprint",
     "parse_field",
     "parse_header_row",
     "Field",
