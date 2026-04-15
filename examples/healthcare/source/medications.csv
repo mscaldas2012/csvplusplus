@@ -1,0 +1,23 @@
+Start,Stop,Patient,Encounter,Code,Description,ReasonCode,ReasonDescription
+2015-07-01,,PAT-001,ENC-001,860975,Metformin 500 MG Oral Tablet,44054006,Type 2 diabetes mellitus
+2012-04-01,,PAT-001,ENC-001,314076,Lisinopril 10 MG Oral Tablet,59621000,Essential hypertension
+2018-10-01,,PAT-001,ENC-001,617310,Atorvastatin 20 MG Oral Tablet,55822004,Hyperlipidemia
+2015-07-01,,PAT-001,ENC-002,860975,Metformin 500 MG Oral Tablet,44054006,Type 2 diabetes mellitus
+2012-04-01,,PAT-001,ENC-002,314076,Lisinopril 10 MG Oral Tablet,59621000,Essential hypertension
+2018-10-01,,PAT-001,ENC-002,617310,Atorvastatin 20 MG Oral Tablet,55822004,Hyperlipidemia
+2023-01-15,,PAT-001,ENC-002,197361,Amlodipine 5 MG Oral Tablet,59621000,Essential hypertension
+2010-05-01,,PAT-002,ENC-003,745679,Albuterol 0.09 MG/ACTUAT Metered Dose Inhaler,195967001,Asthma
+2010-05-01,,PAT-002,ENC-003,616830,Fluticasone Propionate 0.044 MG/ACTUAT Inhaler,195967001,Asthma
+2017-09-01,,PAT-003,ENC-004,310429,Furosemide 20 MG Oral Tablet,84114007,Heart failure (disorder)
+2017-09-01,,PAT-003,ENC-004,855332,Warfarin Sodium 5 MG Oral Tablet,49436004,Atrial fibrillation
+2017-09-01,,PAT-003,ENC-004,866514,Metoprolol Succinate 25 MG Extended Release Oral Tablet,49436004,Atrial fibrillation
+2009-12-01,,PAT-003,ENC-004,314076,Lisinopril 10 MG Oral Tablet,59621000,Essential hypertension
+2017-09-01,,PAT-003,ENC-005,310429,Furosemide 20 MG Oral Tablet,84114007,Heart failure (disorder)
+2017-09-01,2023-06-22,PAT-003,ENC-005,855332,Warfarin Sodium 5 MG Oral Tablet,49436004,Atrial fibrillation — held for emergency
+2017-09-01,,PAT-003,ENC-005,866514,Metoprolol Succinate 25 MG Extended Release Oral Tablet,49436004,Atrial fibrillation
+2009-12-01,,PAT-003,ENC-005,314076,Lisinopril 10 MG Oral Tablet,59621000,Essential hypertension
+2020-02-01,,PAT-004,ENC-006,312940,Sertraline 50 MG Oral Tablet,197480006,Anxiety disorder
+2019-08-01,,PAT-004,ENC-006,966222,Levothyroxine Sodium 0.05 MG Oral Tablet,40930008,Hypothyroidism
+2010-05-01,,PAT-002,ENC-008,745679,Albuterol 0.09 MG/ACTUAT Metered Dose Inhaler,195967001,Asthma
+2010-05-01,,PAT-002,ENC-008,616830,Fluticasone Propionate 0.044 MG/ACTUAT Inhaler,195967001,Asthma
+2023-09-05,2023-09-15,PAT-002,ENC-008,312617,Prednisolone 5 MG Oral Tablet,195967001,Asthma exacerbation

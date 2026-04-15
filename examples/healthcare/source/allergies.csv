@@ -1,0 +1,5 @@
+Start,Stop,Patient,Encounter,Code,System,Description,Type,Category,Reaction1,Description1,Severity1,Reaction2,Description2,Severity2
+2012-04-01,,PAT-001,ENC-001,372687004,SNOMED,Penicillin,allergy,medication,126485001,Urticaria,MODERATE,41291007,Angioedema,MILD
+2015-06-01,,PAT-001,ENC-001,387406002,SNOMED,Sulfonamide,allergy,medication,271807003,Drug eruption,MILD,,,
+2017-08-12,,PAT-003,ENC-004,387458008,SNOMED,Aspirin,allergy,medication,74474003,Gastrointestinal hemorrhage,SEVERE,,,
+2020-01-15,,PAT-004,ENC-006,387494007,SNOMED,Codeine,allergy,medication,422587007,Nausea,MILD,422400008,Vomiting,MILD

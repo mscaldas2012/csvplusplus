@@ -1,0 +1,9 @@
+Id,Start,Stop,Patient,EncounterClass,Code,Description,ReasonCode,ReasonDescription
+ENC-001,2023-01-15T09:00:00Z,2023-01-15T10:00:00Z,PAT-001,ambulatory,185349003,Outpatient Encounter,,Diabetes and hypertension follow-up
+ENC-002,2023-07-20T14:00:00Z,2023-07-20T15:00:00Z,PAT-001,ambulatory,185349003,Outpatient Encounter,,Diabetes follow-up — medication adjustment
+ENC-003,2023-02-10T10:30:00Z,2023-02-10T11:30:00Z,PAT-002,ambulatory,185349003,Outpatient Encounter,195967001,Asthma annual review
+ENC-004,2023-03-08T08:00:00Z,2023-03-08T09:30:00Z,PAT-003,ambulatory,185349003,Outpatient Encounter,84114007,Heart failure routine review
+ENC-005,2023-06-22T22:15:00Z,2023-06-23T18:00:00Z,PAT-003,emergency,50849002,Emergency Room Visit,84114007,Acute decompensated heart failure
+ENC-006,2023-04-12T11:00:00Z,2023-04-12T12:00:00Z,PAT-004,ambulatory,185349003,Outpatient Encounter,,Anxiety and thyroid follow-up
+ENC-007,2023-05-18T09:30:00Z,2023-05-18T10:30:00Z,PAT-005,wellness,185389009,Wellness Visit,,Annual wellness visit
+ENC-008,2023-09-05T15:00:00Z,2023-09-05T16:30:00Z,PAT-002,urgentcare,11429006,Consultation,195967001,Asthma exacerbation
