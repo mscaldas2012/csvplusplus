@@ -3,6 +3,7 @@
 **CSV with arrays and structured fields — backward-compatible with every CSV tool you already use.**
 
 [![IETF Draft](https://img.shields.io/badge/IETF-draft--mscaldas--csvpp--02-blue)](https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/)
+[![PyPI](https://img.shields.io/pypi/v/csvplusplus)](https://pypi.org/project/csvplusplus/)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)](ri/)
 [![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)](ri/pyproject.toml)
 [![Website](https://img.shields.io/badge/website-csvplusplus.com-informational)](https://csvplusplus.com)
@@ -50,7 +51,7 @@ ORD-002,Sprocket^1^8.50,4^Good quality
 ## Try it in 30 seconds
 
 ```bash
-pip install -e "ri/[dev]"
+pip install csvplusplus
 ```
 
 ```python
