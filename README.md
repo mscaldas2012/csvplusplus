@@ -204,7 +204,7 @@ The most valuable contributions right now are:
 - **Share examples** — PRs adding real-world conversions to `examples/` are very welcome
 
 ```bash
-git clone https://github.com/mscaldas/csvplusplus
+git clone https://github.com/mscaldas2012/csvplusplus
 cd csvplusplus/ri
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
