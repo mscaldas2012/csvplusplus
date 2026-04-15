@@ -1,0 +1,71 @@
+Date,Patient,Encounter,Category,Code,Description,Value,Units,Type
+2023-01-15,PAT-001,ENC-001,vital-signs,8480-6,Systolic Blood Pressure,138,mmHg,numeric
+2023-01-15,PAT-001,ENC-001,vital-signs,8462-4,Diastolic Blood Pressure,88,mmHg,numeric
+2023-01-15,PAT-001,ENC-001,vital-signs,8867-4,Heart rate,76,/min,numeric
+2023-01-15,PAT-001,ENC-001,vital-signs,8310-5,Body temperature,37.0,Cel,numeric
+2023-01-15,PAT-001,ENC-001,vital-signs,39156-5,Body mass index (BMI),31.2,kg/m2,numeric
+2023-01-15,PAT-001,ENC-001,laboratory,4548-4,Hemoglobin A1c/Hemoglobin.total,7.8,%,numeric
+2023-01-15,PAT-001,ENC-001,laboratory,2339-0,Glucose,168,mg/dL,numeric
+2023-01-15,PAT-001,ENC-001,laboratory,2160-0,Creatinine,1.2,mg/dL,numeric
+2023-01-15,PAT-001,ENC-001,laboratory,62238-1,Glomerular filtration rate,62,mL/min/1.73m2,numeric
+2023-01-15,PAT-001,ENC-001,laboratory,2093-3,Total Cholesterol,210,mg/dL,numeric
+2023-07-20,PAT-001,ENC-002,vital-signs,8480-6,Systolic Blood Pressure,128,mmHg,numeric
+2023-07-20,PAT-001,ENC-002,vital-signs,8462-4,Diastolic Blood Pressure,82,mmHg,numeric
+2023-07-20,PAT-001,ENC-002,vital-signs,8867-4,Heart rate,72,/min,numeric
+2023-07-20,PAT-001,ENC-002,vital-signs,8310-5,Body temperature,36.8,Cel,numeric
+2023-07-20,PAT-001,ENC-002,vital-signs,39156-5,Body mass index (BMI),30.8,kg/m2,numeric
+2023-07-20,PAT-001,ENC-002,laboratory,4548-4,Hemoglobin A1c/Hemoglobin.total,7.2,%,numeric
+2023-07-20,PAT-001,ENC-002,laboratory,2339-0,Glucose,142,mg/dL,numeric
+2023-07-20,PAT-001,ENC-002,laboratory,2160-0,Creatinine,1.1,mg/dL,numeric
+2023-02-10,PAT-002,ENC-003,vital-signs,8480-6,Systolic Blood Pressure,118,mmHg,numeric
+2023-02-10,PAT-002,ENC-003,vital-signs,8462-4,Diastolic Blood Pressure,74,mmHg,numeric
+2023-02-10,PAT-002,ENC-003,vital-signs,8867-4,Heart rate,82,/min,numeric
+2023-02-10,PAT-002,ENC-003,vital-signs,8310-5,Body temperature,36.9,Cel,numeric
+2023-02-10,PAT-002,ENC-003,vital-signs,39156-5,Body mass index (BMI),22.1,kg/m2,numeric
+2023-02-10,PAT-002,ENC-003,vital-signs,59408-5,Oxygen saturation,97,%,numeric
+2023-02-10,PAT-002,ENC-003,laboratory,19867-0,FEV1 % of predicted,78,%,numeric
+2023-03-08,PAT-003,ENC-004,vital-signs,8480-6,Systolic Blood Pressure,132,mmHg,numeric
+2023-03-08,PAT-003,ENC-004,vital-signs,8462-4,Diastolic Blood Pressure,84,mmHg,numeric
+2023-03-08,PAT-003,ENC-004,vital-signs,8867-4,Heart rate,78,/min,numeric
+2023-03-08,PAT-003,ENC-004,vital-signs,8310-5,Body temperature,36.7,Cel,numeric
+2023-03-08,PAT-003,ENC-004,vital-signs,39156-5,Body mass index (BMI),27.3,kg/m2,numeric
+2023-03-08,PAT-003,ENC-004,vital-signs,59408-5,Oxygen saturation,96,%,numeric
+2023-03-08,PAT-003,ENC-004,laboratory,34714-6,INR,2.3,{INR},numeric
+2023-03-08,PAT-003,ENC-004,laboratory,2160-0,Creatinine,1.4,mg/dL,numeric
+2023-03-08,PAT-003,ENC-004,laboratory,33762-6,NT-proBNP,450,ng/L,numeric
+2023-03-08,PAT-003,ENC-004,laboratory,2951-2,Sodium,138,mmol/L,numeric
+2023-06-22,PAT-003,ENC-005,vital-signs,8480-6,Systolic Blood Pressure,158,mmHg,numeric
+2023-06-22,PAT-003,ENC-005,vital-signs,8462-4,Diastolic Blood Pressure,96,mmHg,numeric
+2023-06-22,PAT-003,ENC-005,vital-signs,8867-4,Heart rate,110,/min,numeric
+2023-06-22,PAT-003,ENC-005,vital-signs,8310-5,Body temperature,37.2,Cel,numeric
+2023-06-22,PAT-003,ENC-005,vital-signs,39156-5,Body mass index (BMI),28.1,kg/m2,numeric
+2023-06-22,PAT-003,ENC-005,vital-signs,59408-5,Oxygen saturation,91,%,numeric
+2023-06-22,PAT-003,ENC-005,laboratory,34714-6,INR,1.9,{INR},numeric
+2023-06-22,PAT-003,ENC-005,laboratory,33762-6,NT-proBNP,1200,ng/L,numeric
+2023-06-22,PAT-003,ENC-005,laboratory,2160-0,Creatinine,1.7,mg/dL,numeric
+2023-06-22,PAT-003,ENC-005,laboratory,2951-2,Sodium,135,mmol/L,numeric
+2023-04-12,PAT-004,ENC-006,vital-signs,8480-6,Systolic Blood Pressure,124,mmHg,numeric
+2023-04-12,PAT-004,ENC-006,vital-signs,8462-4,Diastolic Blood Pressure,80,mmHg,numeric
+2023-04-12,PAT-004,ENC-006,vital-signs,8867-4,Heart rate,68,/min,numeric
+2023-04-12,PAT-004,ENC-006,vital-signs,8310-5,Body temperature,36.6,Cel,numeric
+2023-04-12,PAT-004,ENC-006,vital-signs,39156-5,Body mass index (BMI),24.8,kg/m2,numeric
+2023-04-12,PAT-004,ENC-006,laboratory,3016-3,TSH,3.2,mIU/L,numeric
+2023-04-12,PAT-004,ENC-006,laboratory,3024-7,Free T4,1.1,ng/dL,numeric
+2023-05-18,PAT-005,ENC-007,vital-signs,8480-6,Systolic Blood Pressure,116,mmHg,numeric
+2023-05-18,PAT-005,ENC-007,vital-signs,8462-4,Diastolic Blood Pressure,72,mmHg,numeric
+2023-05-18,PAT-005,ENC-007,vital-signs,8867-4,Heart rate,65,/min,numeric
+2023-05-18,PAT-005,ENC-007,vital-signs,8310-5,Body temperature,36.5,Cel,numeric
+2023-05-18,PAT-005,ENC-007,vital-signs,39156-5,Body mass index (BMI),23.4,kg/m2,numeric
+2023-05-18,PAT-005,ENC-007,vital-signs,59408-5,Oxygen saturation,99,%,numeric
+2023-05-18,PAT-005,ENC-007,laboratory,2339-0,Glucose,92,mg/dL,numeric
+2023-05-18,PAT-005,ENC-007,laboratory,2093-3,Total Cholesterol,178,mg/dL,numeric
+2023-05-18,PAT-005,ENC-007,laboratory,2085-9,HDL Cholesterol,52,mg/dL,numeric
+2023-05-18,PAT-005,ENC-007,laboratory,18262-6,LDL Cholesterol,108,mg/dL,numeric
+2023-05-18,PAT-005,ENC-007,laboratory,2571-8,Triglycerides,90,mg/dL,numeric
+2023-09-05,PAT-002,ENC-008,vital-signs,8480-6,Systolic Blood Pressure,122,mmHg,numeric
+2023-09-05,PAT-002,ENC-008,vital-signs,8462-4,Diastolic Blood Pressure,78,mmHg,numeric
+2023-09-05,PAT-002,ENC-008,vital-signs,8867-4,Heart rate,92,/min,numeric
+2023-09-05,PAT-002,ENC-008,vital-signs,8310-5,Body temperature,37.1,Cel,numeric
+2023-09-05,PAT-002,ENC-008,vital-signs,39156-5,Body mass index (BMI),22.4,kg/m2,numeric
+2023-09-05,PAT-002,ENC-008,vital-signs,59408-5,Oxygen saturation,95,%,numeric
+2023-09-05,PAT-002,ENC-008,laboratory,19867-0,FEV1 % of predicted,65,%,numeric

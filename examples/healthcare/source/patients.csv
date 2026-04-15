@@ -1,0 +1,6 @@
+Id,First,Last,BirthDate,Gender,Race,City,State,Zip,Healthcare_Expenses,Healthcare_Coverage
+PAT-001,John,Santos,1965-03-22,M,White,Sao Paulo,SP,01310,18420.50,12300.00
+PAT-002,Maria,Oliveira,1989-07-15,F,Mixed,Rio de Janeiro,RJ,20040,5280.75,3100.00
+PAT-003,Carlos,Mendes,1951-11-08,M,White,Porto Alegre,RS,90010,62100.00,38400.00
+PAT-004,Ana,Lima,1978-05-30,F,Mixed,Belo Horizonte,MG,30112,7950.25,5200.00
+PAT-005,Roberto,Costa,1995-01-12,M,White,Curitiba,PR,80010,890.00,890.00

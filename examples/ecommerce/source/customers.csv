@@ -1,0 +1,11 @@
+customer_id,customer_zip_code_prefix,customer_city,customer_state
+CUST-101,01310,Sao Paulo,SP
+CUST-102,20040,Rio de Janeiro,RJ
+CUST-103,30112,Belo Horizonte,MG
+CUST-104,80010,Curitiba,PR
+CUST-105,90010,Porto Alegre,RS
+CUST-106,40010,Salvador,BA
+CUST-107,69010,Manaus,AM
+CUST-108,60010,Fortaleza,CE
+CUST-109,70002,Brasilia,DF
+CUST-110,49010,Aracaju,SE

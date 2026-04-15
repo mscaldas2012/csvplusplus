@@ -1,0 +1,9 @@
+review_id,order_id,review_score,review_comment_title,review_comment_message,review_creation_date
+REV-001,ORD-0001,5,Great purchase,Products arrived well packed and ahead of schedule. Very happy!,2023-03-21 10:00:00
+REV-002,ORD-0002,4,Good product,The furniture was solid but assembly instructions were confusing.,2023-03-23 14:30:00
+REV-003,ORD-0003,3,Average experience,Products were fine but delivery took longer than expected.,2023-03-25 09:15:00
+REV-004,ORD-0004,5,Excellent laptop,Arrived fast and in perfect condition. Exactly as described.,2023-03-22 16:45:00
+REV-005,ORD-0005,5,Love it,Both items were exactly what I needed. Fast shipping too!,2023-03-27 11:00:00
+REV-006,ORD-0006,1,Broken on arrival,The toy arrived completely damaged. Terrible packaging.,2023-03-29 08:30:00
+REV-007,ORD-0007,4,Good quality,Tools are well made. One item had a minor scratch but overall good.,2023-03-30 13:00:00
+REV-008,ORD-0008,5,Best electronics deal,All three items arrived together. Fast delivery. Highly recommend.,2023-03-31 10:00:00

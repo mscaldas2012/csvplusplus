@@ -6,3 +6,8 @@ __pycache__/
 dist/
 build/
 .pytest_cache/
+
+# Coverage artifacts
+.coverage
+coverage.xml
+htmlcov/
