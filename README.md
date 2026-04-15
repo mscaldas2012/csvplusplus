@@ -3,6 +3,7 @@
 **CSV with arrays and structured fields — backward-compatible with every CSV tool you already use.**
 
 [![IETF Draft](https://img.shields.io/badge/IETF-draft--mscaldas--csvpp--02-blue)](https://datatracker.ietf.org/doc/draft-mscaldas-csvpp/)
+[![PyPI](https://img.shields.io/pypi/v/csvplusplus)](https://pypi.org/project/csvplusplus/)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)](ri/)
 [![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)](ri/pyproject.toml)
 [![Website](https://img.shields.io/badge/website-csvplusplus.com-informational)](https://csvplusplus.com)
@@ -50,7 +51,7 @@ ORD-002,Sprocket^1^8.50,4^Good quality
 ## Try it in 30 seconds
 
 ```bash
-pip install -e "ri/[dev]"
+pip install csvplusplus
 ```
 
 ```python
@@ -190,7 +191,7 @@ CSV++ is an IETF Internet-Draft extending [RFC 4180](https://www.rfc-editor.org/
 - **Website:** [csvplusplus.com](https://csvplusplus.com)
 - **Status:** Individual submission, seeking community review
 
-The draft is looking for real-world feedback. If you use CSV++ in a project, encounter an edge case, or have thoughts on the delimiter choices or syntax — open a [GitHub Discussion](https://github.com/mscaldas/csvplusplus/discussions) or comment on the IETF datatracker.
+The draft is looking for real-world feedback. If you use CSV++ in a project, encounter an edge case, or have thoughts on the delimiter choices or syntax — open a [GitHub Discussion](https://github.com/mscaldas2012/csvplusplus/discussions) or comment on the IETF datatracker.
 
 ---
 
@@ -204,7 +205,7 @@ The most valuable contributions right now are:
 - **Share examples** — PRs adding real-world conversions to `examples/` are very welcome
 
 ```bash
-git clone https://github.com/mscaldas/csvplusplus
+git clone https://github.com/mscaldas2012/csvplusplus
 cd csvplusplus/ri
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
