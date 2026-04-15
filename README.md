@@ -190,7 +190,7 @@ CSV++ is an IETF Internet-Draft extending [RFC 4180](https://www.rfc-editor.org/
 - **Website:** [csvplusplus.com](https://csvplusplus.com)
 - **Status:** Individual submission, seeking community review
 
-The draft is looking for real-world feedback. If you use CSV++ in a project, encounter an edge case, or have thoughts on the delimiter choices or syntax — open a [GitHub Discussion](https://github.com/mscaldas/csvplusplus/discussions) or comment on the IETF datatracker.
+The draft is looking for real-world feedback. If you use CSV++ in a project, encounter an edge case, or have thoughts on the delimiter choices or syntax — open a [GitHub Discussion](https://github.com/mscaldas2012/csvplusplus/discussions) or comment on the IETF datatracker.
 
 ---
 
